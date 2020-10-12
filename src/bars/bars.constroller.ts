@@ -1,17 +1,17 @@
 import { Controller , Get , Param } from '@nestjs/common'
-import { BarsRepository } from './bars.repository'
+import { BarsService } from './bars.service'
 @Controller('bars')
 export class BarsController {
 
-    constructor(private barsrepository: BarsRepository ) {}
+    constructor(private barservice: BarsService ) {}
     @Get()
     get_list_bars(): any {
-        return this.barsrepository.list_bars();
+        return this.barservice.list_bars();
     }
 
     @Get(':id')
     get_certain_bars(@Param('id') id): any{
-        return this.barsrepository.bar_profile(id);
+        return this.barservice.bar_profile(id);
     }
     
 }
