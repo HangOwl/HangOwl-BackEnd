@@ -33,15 +33,14 @@ export class BarsService{
     async add_bar(bar): Promise<Bar | undefined>
     {
         //add bar then return bar that added
-        //bar is detail of bar
+        //bar is json format
         return bar
     }
-    async bar_profile(barid): Promise<Bar | undefined>
+    async bar_profile(id): Promise<Bar | undefined>
     {
-        //return  bar that id == barid
+        //return  bar that match with id
         //bar_id is string
-        return this.bars.find(bar => bar.userId === barid);
+        return this.bars.find(bar => bar.userId === id);
     }
-
 
 }
