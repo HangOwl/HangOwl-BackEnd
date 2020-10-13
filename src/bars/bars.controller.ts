@@ -21,7 +21,6 @@ export class BarsController {
                           'CloseTime' : req.body.CloseTime , 'CloseWeekDay' : req.body.CloseWeekDay , 'Address' : req.body.Address ,
                           'BarDescription' : req.body.BarDescription , 'BarRule' : req.body.BarRule }
         //check if Value is Null
-
         for (const payloadKey of Object.keys(payload)) {
             if( payload[payloadKey] == null)
             {
@@ -48,11 +47,19 @@ export class BarsController {
     @Put()
     edit_certain_bar(@Headers('Authorization') auth: string , @Request() req  ): any{
         const current_user = this.jwtUtil.decode(auth);
-        const payload = { 'id' : current_user.userID , 'Email' : req.body.Email , 'Password' : req.body.Password ,
+        //return this.barservice.add_bar();
+        const payload = { 'Email' : req.body.Email , 'Password' : req.body.Password ,
                           'BarName' : req.body.BarName , 'LineID' : req.body.LineID , 'OpenTime' : req.body.OpenTime , 
                           'CloseTime' : req.body.CloseTime , 'CloseWeekDay' : req.body.CloseWeekDay , 'Address' : req.body.Address ,
                           'BarDescription' : req.body.BarDescription , 'BarRule' : req.body.BarRule }
-        return this.barservice.edit_bar(payload)
+        //check if Value is Null
+        for (const payloadKey of Object.keys(payload)) {
+            if( payload[payloadKey] == null)
+            {
+                return null
+            }
+        }
+        return this.barservice.edit_bar(current_user.userId ,payload)
     }
     
 }

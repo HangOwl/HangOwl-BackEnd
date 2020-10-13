@@ -12,13 +12,14 @@ export class AppController {
               private readonly jwtUtil: JWTUtil, ) {}
 
   @Get()
-  getHello(@Headers('Authorization') auth: string): any {
+  getHello(): any {
     return "Hello World"
   }
 
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async login(@Request() req) {
+    console.log(req.user)
     return this.authService.login(req.user);
   }
 }
