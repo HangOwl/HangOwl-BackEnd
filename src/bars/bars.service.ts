@@ -108,6 +108,7 @@ export class BarsService{
           throw new NotFoundException('Could not find product.');
         }
         return bar;
+
     }
 
 
