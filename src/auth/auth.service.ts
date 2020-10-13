@@ -21,8 +21,8 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findOne(email);
     if(!user) return null 
-    //const input_password = await bcrypt.hash(password , user.salt)
-    const input_password = password
+    //const input_password = await bcrypt.hash(password , user.salt) // Uncomment this when use database
+    const input_password = password // comment this when use database
     if ( user.Password == input_password)
     {
       const { Password , ...result } = user
