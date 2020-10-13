@@ -12,19 +12,22 @@ export class UsersService {
         id: 1,
         Email: 'john',
         Password: 'changeme',
-        Role: 1
+        Role: 1 ,
+        Detail: 'Hello'
       },
       {
         id: 2,
         Email: 'chris',
         Password: 'secret',
-        Role: 2
+        Role: 2 ,
+        Detail: 'Hello'
       },
       {
         id: 3,
         Email: 'maria',
         Password: 'guess',
-        Role: 3
+        Role: 3 ,
+        Detail: 'Hello'
       },
     ];
   }
