@@ -12,7 +12,7 @@ export class AppController {
               private readonly jwtUtil: JWTUtil, ) {}
 
   @Get()
-  getHello(@Headers('Authorization') auth: string): any {
+  getHello(): any {
     return "Hello World"
   }
 

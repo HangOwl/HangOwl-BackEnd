@@ -15,6 +15,7 @@ export class BarsController {
     
     @Post()
     add_BAR( @Request() req ): any {
+        console.log("addbar");
         //return this.barservice.add_bar();
         const payload = { 'Email' : req.body.Email , 'Password' : req.body.Password ,
                           'BarName' : req.body.BarName , 'LineID' : req.body.LineID , 'OpenTime' : req.body.OpenTime , 
@@ -30,29 +31,29 @@ export class BarsController {
         }
         return this.barservice.add_bar(payload)
     }
-    @UseGuards(JwtAuthGuard)
-
-    @Get('decode')
-    decode_it(@Headers('Authorization') auth: string): any {
-        const json = this.jwtUtil.decode(auth);
-        return json
-      }
-
-    @UseGuards(JwtAuthGuard)
-    @Get(':id')
-    get_certain_bar(@Param('id') id): any{
-        return this.barservice.bar_profile(id);
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Put()
-    edit_certain_bar(@Headers('Authorization') auth: string , @Request() req  ): any{
-        const current_user = this.jwtUtil.decode(auth);
-        const payload = { 'id' : current_user.userID , 'Email' : req.body.Email , 'Password' : req.body.Password ,
-                          'BarName' : req.body.BarName , 'LineID' : req.body.LineID , 'OpenTime' : req.body.OpenTime , 
-                          'CloseTime' : req.body.CloseTime , 'CloseWeekDay' : req.body.CloseWeekDay , 'Address' : req.body.Address ,
-                          'BarDescription' : req.body.BarDescription , 'BarRule' : req.body.BarRule }
-        return this.barservice.edit_bar(payload)
-    }
+    //@UseGuards(JwtAuthGuard)
+//
+    //@Get('decode')
+    //decode_it(@Headers('Authorization') auth: string): any {
+    //    const json = this.jwtUtil.decode(auth);
+    //    return json
+    //  }
+//
+    //@UseGuards(JwtAuthGuard)
+    //@Get(':id')
+    //get_certain_bar(@Param('id') id): any{
+    //    return this.barservice.bar_profile(id);
+    //}
+//
+    //@UseGuards(JwtAuthGuard)
+    //@Put()
+    //edit_certain_bar(@Headers('Authorization') auth: string , @Request() req  ): any{
+    //    const current_user = this.jwtUtil.decode(auth);
+    //    const payload = { 'id' : current_user.userID , 'Email' : req.body.Email , 'Password' : req.body.Password ,
+    //                      'BarName' : req.body.BarName , 'LineID' : req.body.LineID , 'OpenTime' : req.body.OpenTime , 
+    //                      'CloseTime' : req.body.CloseTime , 'CloseWeekDay' : req.body.CloseWeekDay , 'Address' : req.body.Address ,
+    //                      'BarDescription' : req.body.BarDescription , 'BarRule' : req.body.BarRule }
+    //    return this.barservice.edit_bar(payload)
+    //}
     
 }
