@@ -61,9 +61,9 @@ export class BarsService{
         return bar
     }
   
-    async edit_bar(id,bar)
+    async edit_bar(bar)
     {
- 
+        //payload in bar is  'id' 'Email','Password' ,'BarName','LineID','OpenTime','CloseTime','CloseWeekDay','Address' , 'BarDescription', 'BarRule'
         bar.Role = 1
         // Check if is true format
         const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

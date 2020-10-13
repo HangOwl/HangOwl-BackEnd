@@ -59,7 +59,7 @@ export class BarsController {
                 return null
             }
         }
-        return this.barservice.edit_bar(current_user.userId ,payload)
+        return this.barservice.edit_bar(payload)
     }
     
 }
