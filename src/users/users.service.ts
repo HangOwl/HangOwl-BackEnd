@@ -11,19 +11,19 @@ export class UsersService {
       {
         id: 1,
         Email: 'john',
-        password: 'changeme',
+        Password: 'changeme',
         Role: 1
       },
       {
         id: 2,
         Email: 'chris',
-        password: 'secret',
+        Password: 'secret',
         Role: 2
       },
       {
         id: 3,
         Email: 'maria',
-        password: 'guess',
+        Password: 'guess',
         Role: 3
       },
     ];
