@@ -1,38 +1,22 @@
 import { Injectable } from '@nestjs/common';
-
+import { InjectModel } from '@nestjs/mongoose';
+import { Bar } from './bars.model';
+import { BarsModule } from './bars.module';
+import { Model } from 'mongoose'
 const bcrypt = require('bcrypt')
 
-export type Bar = any;
+
 @Injectable()
 export class BarsService{
     private readonly bars: Bar[];
-    constructor() {
-        this.bars = [
-          {
-            userId: '1',
-            username: 'john',
-            password: 'changeme',
-            barname: '123'
-          },
-          {
-            userId: '2',
-            username: 'chris',
-            password: 'secret',
-            barname: '456'
-          },
-          {
-            userId: '3',
-            username: 'maria',
-            password: 'guess',
-            barname: '789'
-          },
-        ];
-      }
-    async list_bars(): Promise<Bar> {
-        //return list of all bars
-        return this.bars;
-      }
-    async add_bar(bar): Promise<Bar | undefined>
+    constructor(
+      @InjectModel('Bar') private readonly barModel: Model<Bar>
+      ) {}
+    async list_bars()  {
+        const bars = await this.barModel.find().exec();
+        return bars;
+    }
+    async add_bar(bar): Promise<string>
     {
         //payload in bar is  'Email','Password' ,'BarName','LineID','OpenTime','CloseTime','CloseWeekDay','Address' , 'BarDescription', 'BarRule'
         //Doesn't have Role , ProfilePicPath , AdditionalPicture 
@@ -56,23 +40,42 @@ export class BarsService{
         bar.salt = await bcrypt.genSalt(10)
         bar.Password = await bcrypt.hash(bar.Password , bar.salt )
         //adding bar procedure
-
+        const newBar = new this.barModel({
+          Email: bar.Email,
+          Password: bar.Password,
+          Salt: bar.salt,
+          Role: bar.Role,
+          BarName: bar.BarName,
+          ProfilePicPath : bar.ProfilePicPath,
+          AdditionalPicPath : bar.AdditionalPicPath,
+          LineID : bar.LineID,
+          OpenTime : bar.OpenTime,
+          CloseTime : bar.CloseTime,
+          CloseWeekDay : bar.CloseWeekDay,
+          Address: bar.Address,
+          AdminApproved : false,
+          BarDescription : bar.BarDescription,
+          BarRule : bar.BarRule,
+          Reservations: [],
+        });
+        const result = await newBar.save();
+        console.log(result);
         //email procedure
-        return bar
+        return result.id as string;
     }
   
-    async edit_bar(bar)
-    {
-      
-
-      return bar
-    }
-
-    async bar_profile(id): Promise<Bar | undefined>
-    {
-        //return  bar that match with id
-        //id is string
-        return this.bars.find(bar => bar.userId === id);
-    }
+    //async edit_bar(bar)
+    //{
+    //  
+//
+    //  return bar
+    //}
+//
+    //async bar_profile(id): Promise<Bar | undefined>
+    //{
+    //    //return  bar that match with id
+    //    //id is string
+    //    return this.bars.find(bar => bar.userId === id);
+    //}
 
 }
