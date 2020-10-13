@@ -1,4 +1,4 @@
-import { Controller , Get , Param, UseGuards , Headers, Post , Request } from '@nestjs/common'
+import { Controller , Get , Param, UseGuards , Headers, Post , Request, Put } from '@nestjs/common'
 import { BarsService } from './bars.service'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { JWTUtil } from 'src/auth/JWTUtil';
@@ -38,11 +38,21 @@ export class BarsController {
         return json
       }
 
+    @UseGuards(JwtAuthGuard)
     @Get(':id')
-    get_certain_bars(@Param('id') id): any{
+    get_certain_bar(@Param('id') id): any{
         return this.barservice.bar_profile(id);
     }
 
-
+    @UseGuards(JwtAuthGuard)
+    @Put()
+    edit_certain_bar(@Headers('Authorization') auth: string , @Request() req  ): any{
+        const current_user = this.jwtUtil.decode(auth);
+        const payload = { 'id' : current_user.userID , 'Email' : req.body.Email , 'Password' : req.body.Password ,
+                          'BarName' : req.body.BarName , 'LineID' : req.body.LineID , 'OpenTime' : req.body.OpenTime , 
+                          'CloseTime' : req.body.CloseTime , 'CloseWeekDay' : req.body.CloseWeekDay , 'Address' : req.body.Address ,
+                          'BarDescription' : req.body.BarDescription , 'BarRule' : req.body.BarRule }
+        return this.barservice.edit_bar(payload)
+    }
     
 }

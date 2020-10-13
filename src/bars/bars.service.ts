@@ -58,10 +58,16 @@ export class BarsService{
         //adding bar procedure
 
         //email procedure
-
-
         return bar
     }
+  
+    async edit_bar(bar)
+    {
+      
+
+      return bar
+    }
+
     async bar_profile(id): Promise<Bar | undefined>
     {
         //return  bar that match with id
