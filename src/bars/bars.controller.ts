@@ -21,7 +21,7 @@ export class BarsController {
                           'CloseTime' : req.body.CloseTime , 'CloseWeekDay' : req.body.CloseWeekDay , 'Address' : req.body.Address ,
                           'BarDescription' : req.body.BarDescription , 'BarRule' : req.body.BarRule }
         //check if Value is Null
-        console.log(Object.keys(payload))
+
         for (const payloadKey of Object.keys(payload)) {
             if( payload[payloadKey] == null)
             {

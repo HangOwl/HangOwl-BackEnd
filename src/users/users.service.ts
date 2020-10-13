@@ -29,6 +29,7 @@ export class UsersService {
     ];
   }
 
+  // if has database ( need to return userData , password ,salt )
   async findOne(username: string): Promise<User | undefined> {
     return this.users.find(user => user.username === username);
   }

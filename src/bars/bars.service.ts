@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
+const bcrypt = require('bcrypt')
+
 export type Bar = any;
 @Injectable()
 export class BarsService{
@@ -50,9 +52,14 @@ export class BarsService{
           // Bad Close week Days format
           return null
         
+        // Generate encrpte password
+        bar.salt = await bcrypt.genSalt(10)
+        bar.Password = await bcrypt.hash(bar.Password , bar.salt )
         //adding bar procedure
 
         //email procedure
+
+
         return bar
     }
     async bar_profile(id): Promise<Bar | undefined>
