@@ -12,7 +12,12 @@ export const BarSchema = new mongoose.Schema(
         LineID : String,
         OpenTime : String,
         CloseTime : String,
-        
+        CloseWeekDay : [Boolean],
+        Address: String,
+        AdminApproved : Boolean,
+        BarDescription : String,
+        BarRule : String,
+        Reservations: [String]
 
     }
     , { collection: 'Users' }
@@ -24,9 +29,17 @@ export interface Bar extends mongoose.Document {
     Password: string;
     Salt: string;
     Role: number;
-    Name: string;
-    EmailVerify: boolean;
-    CancelAccount: boolean;
+    BarName: string;
+    ProfilePicPath : string;
+    AdditionalPicPath : string[];
+    LineID : string;
+    OpenTime : string;
+    CloseTime : string;
+    CloseWeekDay : boolean[];
+    Address: string;
+    AdminApproved : boolean;
+    BarDescription : string;
+    BarRule : string;
     Reservations: string[];
-    Favourites: string[];
+
   }
