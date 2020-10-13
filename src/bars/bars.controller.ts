@@ -15,6 +15,7 @@ export class BarsController {
     
     @Post()
     add_BAR( @Request() req ): any {
+        console.log("addbar");
         //return this.barservice.add_bar();
         const payload = { 'Email' : req.body.Email , 'Password' : req.body.Password ,
                           'BarName' : req.body.BarName , 'LineID' : req.body.LineID , 'OpenTime' : req.body.OpenTime , 
@@ -29,6 +30,7 @@ export class BarsController {
         }
         return this.barservice.add_bar(payload)
     }
+
     @UseGuards(JwtAuthGuard)
 
     @Get('decode')
@@ -61,5 +63,6 @@ export class BarsController {
         }
         return this.barservice.edit_bar(current_user.userId ,payload)
     }
+
     
 }
