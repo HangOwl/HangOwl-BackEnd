@@ -32,9 +32,15 @@ export class BarsService{
       }
     async add_bar(bar): Promise<Bar | undefined>
     {
-        //add bar then return bar that added
-        //bar is json format
-        return bar
+        //payload in bar is  'Email','Password' ,'BarName','LineID','OpenTime','CloseTime','CloseWeekDay','Address' , 'BarDescription', 'BarRule'
+        //Doesn't have Role , ProfilePicPath , AdditionalPicture 
+        // Set default
+        bar.Role = 1
+        bar.ProfilePicPath = ""
+        bar.AdditionalPicture = []
+        // Check if is true format
+        // const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        // return re.test(String(bar.Email).toLowerCase());
     }
     async bar_profile(id): Promise<Bar | undefined>
     {
