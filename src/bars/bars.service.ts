@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Bar } from './bars.model';
+import { User } from 'src/users/users.model';
 import { BarsModule } from './bars.module';
 import { Model } from 'mongoose'
 const bcrypt = require('bcrypt')
@@ -10,7 +11,8 @@ const bcrypt = require('bcrypt')
 export class BarsService{
     private readonly bars: Bar[];
     constructor(
-      @InjectModel('Bar') private readonly barModel: Model<Bar>
+      @InjectModel('User') private readonly barModel: Model<Bar>,
+      @InjectModel('User') private readonly userModel: Model<User>
       ) {}
     async list_bars()  {
         const bars = await this.barModel.find().exec();
@@ -18,6 +20,9 @@ export class BarsService{
     }
     async add_bar(bar): Promise<string>
     {
+        const user = await this.userModel.findOne({'Email':bar.Email});
+        if(user)
+          return "Email already exist.";
         //payload in bar is  'Email','Password' ,'BarName','LineID','OpenTime','CloseTime','CloseWeekDay','Address' , 'BarDescription', 'BarRule'
         // Doesn't have Role , ProfilePicPath , AdditionalPicture 
         // Set default
@@ -93,7 +98,17 @@ export class BarsService{
     {
         //return  bar that match with id
         //id is string
-        return this.bars.find(bar => bar.userId === id);
+        let bar;
+        try {
+          bar = await this.barModel.findById(id);
+        }catch(error){
+          throw new NotFoundException('Could not find product.');
+        }
+        if (!bar) {
+          throw new NotFoundException('Could not find product.');
+        }
+        return bar;
+
     }
 
 

@@ -31,15 +31,6 @@ export class BarsController {
         return this.barservice.add_bar(payload)
     }
 
-    @UseGuards(JwtAuthGuard)
-
-    @Get('decode')
-    decode_it(@Headers('Authorization') auth: string): any {
-        const json = this.jwtUtil.decode(auth);
-        return json
-      }
-
-    @UseGuards(JwtAuthGuard)
     @Get(':id')
     get_certain_bar(@Param('id') id): any{
         return this.barservice.bar_profile(id);
