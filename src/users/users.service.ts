@@ -9,28 +9,31 @@ export class UsersService {
   constructor() {
     this.users = [
       {
-        userId: 1,
-        username: 'john',
-        password: 'changeme',
-        role: 1
+        id: 1,
+        Email: 'john',
+        Password: 'changeme',
+        Role: 1 ,
+        Detail: 'Hello'
       },
       {
-        userId: 2,
-        username: 'chris',
-        password: 'secret',
-        role: 2
+        id: 2,
+        Email: 'chris',
+        Password: 'secret',
+        Role: 2 ,
+        Detail: 'Hello'
       },
       {
-        userId: 3,
-        username: 'maria',
-        password: 'guess',
-        role: 3
+        id: 3,
+        Email: 'maria',
+        Password: 'guess',
+        Role: 3 ,
+        Detail: 'Hello'
       },
     ];
   }
 
   // if has database ( need to return userData , password ,salt )
-  async findOne(username: string): Promise<User | undefined> {
-    return this.users.find(user => user.username === username);
+  async findOne(email: string): Promise<User | undefined> {
+    return this.users.find(user => user.Email === email );
   }
 }
