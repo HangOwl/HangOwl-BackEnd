@@ -5,8 +5,8 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 export class AdminsController {
     constructor(private adminservice: AdminsService ,) {}
     @Post()
-    add_BAR( @Request() req ): any {
-        console.log("addbar");
+    add_ADMIN( @Request() req ): any {
+
         //return this.barservice.add_bar();
         const payload = { 'Email' : req.body.Email , 'Password' : req.body.Password  , 'Username' : req.body.Username }
         return this.adminservice.add_admin(payload)
