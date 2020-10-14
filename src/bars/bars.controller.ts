@@ -1,4 +1,4 @@
-import { Controller , Get , Param, UseGuards , Headers, Post , Request, Put , Query , UseInterceptors , UploadedFile} from '@nestjs/common'
+import { Controller , Get , Param, UseGuards , Headers, Post , Request, Put , Query , UseInterceptors , UploadedFile , Patch , Delete } from '@nestjs/common'
 import { BarsService } from './bars.service'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { JWTUtil } from 'src/auth/JWTUtil';
@@ -44,26 +44,14 @@ export class BarsController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Put()
+    @Patch()
     edit_certain_bar(@Headers('Authorization') auth: string , @Request() req  ): any{
         const current_user = this.jwtUtil.decode(auth);
-        //return this.barservice.add_bar();
-        const payload = { 'Email' : req.body.Email , 'Password' : req.body.Password ,
-                          'BarName' : req.body.BarName , 'LineID' : req.body.LineID , 'OpenTime' : req.body.OpenTime , 
-                          'CloseTime' : req.body.CloseTime , 'CloseWeekDay' : req.body.CloseWeekDay , 'Address' : req.body.Address ,
-                          'BarDescription' : req.body.BarDescription , 'BarRule' : req.body.BarRule }
-        //check if Value is Null
-        for (const payloadKey of Object.keys(payload)) {
-            if( payload[payloadKey] == null)
-            {
-                return null
-            }
-        }
-        return this.barservice.edit_bar(current_user.userId ,payload)
+        return this.barservice.edit_bar(current_user.userId , req.body)
     }
 
     @UseGuards(JwtAuthGuard)
-    @Post(':id/pictures')
+    @Patch(':id/pictures')
     @UseInterceptors(
       FileInterceptor('image', {
         storage: diskStorage({
@@ -73,10 +61,23 @@ export class BarsController {
         fileFilter: imageFileFilter,
       }),
     )
-    async uploadedFile(@UploadedFile() file , @Param('id') id , @Headers('Authorization') auth: string ) {
+    async uploadedFile(@UploadedFile() file , @Param('id') id , @Headers('Authorization') auth: string , @Query('profile') profile ) {
       const current_user = this.jwtUtil.decode(auth);
       if(current_user._id != id) return "Id bar and uploader id not matched"
-      this.barservice.picture_add(file.filename)
+      if(profile == 'true') this.barservice.profile_picture_add(id , file.filename)
+      else this.barservice.additonal_picture_add(id , file.filename)
       return file.filename
     }
+    
+    @UseGuards(JwtAuthGuard)
+    @Delete(':id/pictures/:path')
+    async DeletePicture(@UploadedFile() file , @Param('id') id , @Headers('Authorization') auth: string , @Query('profile') profile ) {
+      const current_user = this.jwtUtil.decode(auth);
+      if(current_user._id != id) return "Id bar and uploader id not matched"
+      console.log(profile)
+      if(profile == 'true') this.barservice.profile_picture_add(id , file.filename)
+      else this.barservice.additonal_picture_add(id , file.filename)
+      return file.filename
+    }
+    
 }

@@ -71,26 +71,10 @@ export class BarsService{
     }
   
 
-    async edit_bar(id,bar)
+    async edit_bar(id,edit_content)
     {
- 
-        bar.Role = 1
-        // Check if is true format
-        const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        if ( ! re.test(String(bar.Email).toLowerCase()) ) 
-          // Bad email format
-          return null
-        if ( bar.OpenTime.length != 4 || bar.CloseTime.length != 4 )
-          // Bad time format
-          return null
-        if ( typeof bar.CloseWeekDay != 'object' || bar.CloseWeekDay.length != 7 )
-          // Bad Close week Days format
-          return null
-        // Generate encrpte password
-        bar.salt = await bcrypt.genSalt(10)
-        bar.Password = await bcrypt.hash(bar.Password , bar.salt )
         //editing bar procedure
-        
+           
         return bar
     }
 
@@ -102,10 +86,10 @@ export class BarsService{
         try {
           bar = await this.barModel.findById(id);
         }catch(error){
-          throw new NotFoundException('Could not find product.');
+          throw new NotFoundException('Could not find bar.');
         }
         if (!bar) {
-          throw new NotFoundException('Could not find product.');
+          throw new NotFoundException('Could not find bar.');
         }
         return bar;
     }
@@ -118,16 +102,31 @@ export class BarsService{
       try{
       bars = await this.barModel.find({ BarName: { $regex: search_text, $options: "i" } });
       }catch(error){
-        throw new NotFoundException('Could not find product.');
+        throw new NotFoundException('Could not find bar.');
       }if (!bars) {
-        throw new NotFoundException('Could not find product.');
+        throw new NotFoundException('Could not find bar.');
       }
       return bars;
     }
 
-    async picture_add(filename)
+    async additonal_picture_add(id, filename)
     {
-
-      return filename
+      // add additional picture
+      console.log ("additional pic add")
+      const updatedBar = await this.bar_profile(id);
+      updatedBar.AdditionalPicPath.push(filename);
+      updatedBar.save();
+      return filename;
     }
+
+    async profile_picture_add(id, filename)
+    {
+      // add profile picture
+      const updatedBar = await this.bar_profile(id);
+      updatedBar.ProfilePicPath = filename;
+      updatedBar.save()
+      return updatedBar;
+    }
+
+
 }
