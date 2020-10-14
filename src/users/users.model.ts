@@ -36,7 +36,7 @@ export interface User extends mongoose.Document {
     Name: String,
     EmailVerify: Boolean,
     CancelAccount: Boolean,
-    Favourites: [String],
+    Favourites: any,
     BarName: string;
     ProfilePicPath : string;
     AdditionalPicPath : string[];
