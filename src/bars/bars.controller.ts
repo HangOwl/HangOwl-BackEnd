@@ -62,4 +62,5 @@ export class BarsController {
         return this.barservice.edit_bar(payload)
     }
     
+    
 }
