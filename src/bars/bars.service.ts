@@ -115,4 +115,9 @@ export class BarsService{
 
     }
 
+    async picture_add(filename)
+    {
+
+      return filename
+    }
 }
