@@ -9,8 +9,12 @@ export class BarsController {
     constructor(private barservice: BarsService ,
                 private readonly jwtUtil: JWTUtil , ) {}
     @Get()
-    get_list_bars(): any {
-        return this.barservice.list_bars();
+    get_list_bars( @Query('search') search ): any {
+        if( search && search != "") {
+            return this.barservice.bar_search(search); }
+        else {
+            return this.barservice.list_bars()
+        }
     }
     
     @Post()
@@ -32,11 +36,8 @@ export class BarsController {
     }
 
     @Get(':id')
-    get_certain_bar(@Param('id') id , @Query('search') search ): any{
-        if( search && search != "")
-            return this.barservice.bar_profile(id);
-        else
-            return this.barservice.bar_search(search);
+    get_certain_bar(@Param('id') id ): any{
+        return this.barservice.bar_profile(id);
     }
 
     @UseGuards(JwtAuthGuard)
