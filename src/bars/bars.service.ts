@@ -112,7 +112,17 @@ export class BarsService{
 
     async bar_search(search_text)
     {
-
+      console.log ('search_bar');
+      //search_text is Barname
+      let bars;
+      try{
+      bars = await this.barModel.find({ BarName: { $regex: search_text, $options: "i" } });
+      }catch(error){
+        throw new NotFoundException('Could not find product.');
+      }if (!bars) {
+        throw new NotFoundException('Could not find product.');
+      }
+      return bars;
     }
 
 }
