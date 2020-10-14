@@ -108,8 +108,11 @@ export class BarsService{
           throw new NotFoundException('Could not find product.');
         }
         return bar;
-
     }
 
+    async bar_search(search_text): Promise<Bar | undefined>
+    {
+        
+    }
 
 }
