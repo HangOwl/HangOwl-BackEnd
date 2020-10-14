@@ -15,7 +15,7 @@ export class BarsService{
       @InjectModel('User') private readonly userModel: Model<User>
       ) {}
     async list_bars()  {
-        const bars = await this.barModel.find().exec();
+        const bars = await this.barModel.find({"AdminApproved":true}).exec();
         return bars;
     }
     async add_bar(bar): Promise<string>
@@ -140,15 +140,17 @@ export class BarsService{
       console.log (filename)
       let updatedBar = await this.bar_profile(id);
       await updatedBar.updateOne({ $pull: {"AdditionalPicPath": filename } } );
-      console.log(updatedBar.AdditionalPicPath)
-      
+      updatedBar.save()
       return updatedBar.AdditionalPicPath;
     }
 
     async approve_bar(id)
     {
       // approve bar , id is string of bar_id
-      
+      let updatedBar = await this.bar_profile(id);
+      updatedBar.AdminApproved = true;
+      updatedBar.save()
+      return updatedBar.AdminApproved;
     }
     
 }
