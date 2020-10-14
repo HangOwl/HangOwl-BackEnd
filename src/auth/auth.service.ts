@@ -25,8 +25,8 @@ export class AuthService {
     //const input_password = password // comment this when use database
     if ( user.Password == input_password)
     {
-      const { Password , ...result } = user
-      return result
+        const result = user.toJSON()
+        return { _id : result._id , Role : result.Role  }
     }
     return null
   }
