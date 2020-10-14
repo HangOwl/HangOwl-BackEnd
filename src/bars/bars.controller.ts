@@ -1,4 +1,4 @@
-import { Controller , Get , Param, UseGuards , Headers, Post , Request, Put } from '@nestjs/common'
+import { Controller , Get , Param, UseGuards , Headers, Post , Request, Put , Query } from '@nestjs/common'
 import { BarsService } from './bars.service'
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { JWTUtil } from 'src/auth/JWTUtil';
@@ -32,8 +32,11 @@ export class BarsController {
     }
 
     @Get(':id')
-    get_certain_bar(@Param('id') id): any{
-        return this.barservice.bar_profile(id);
+    get_certain_bar(@Param('id') id , @Query('search') search ): any{
+        if( search && search != "")
+            return this.barservice.bar_profile(id);
+        else
+            return this.barservice.bar_search(search);
     }
 
     @UseGuards(JwtAuthGuard)

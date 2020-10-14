@@ -110,5 +110,9 @@ export class BarsService{
         return bar;
     }
 
+    async bar_search(search_text)
+    {
+
+    }
 
 }

@@ -22,6 +22,5 @@ export class UsersService {
       throw new NotFoundException('Could not find product.');
     }
     return user;
-
   }
 }
