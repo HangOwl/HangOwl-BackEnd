@@ -70,14 +70,20 @@ export class BarsController {
     }
     
     @UseGuards(JwtAuthGuard)
-    @Delete(':id/pictures/:path')
-    async DeletePicture(@UploadedFile() file , @Param('id') id , @Headers('Authorization') auth: string , @Query('profile') profile ) {
+    @Delete(':id/pictures/:filename')
+    async DeletePicture(@Param('id') id , @Headers('Authorization') auth: string , @Query('profile') profile , @Param('filename') filename) {
       const current_user = this.jwtUtil.decode(auth);
       if(current_user._id != id) return "Id bar and uploader id not matched"
-      console.log(profile)
-      if(profile == 'true') this.barservice.profile_picture_add(id , file.filename)
-      else this.barservice.additonal_picture_add(id , file.filename)
-      return file.filename
+      if(profile == 'true') this.barservice.profile_picture_add(id , '')
+      else this.barservice.additonal_picture_remove(id , filename )
     }
-    
+
+    @UseGuards(JwtAuthGuard)
+    @Patch(':id/approve')
+    async approve_bar(@Param('id') id , @Headers('Authorization') auth: string ) {
+      const current_user = this.jwtUtil.decode(auth);
+      if(current_user.Role != 2) return "You are not Adminnnn"
+      else this.barservice.approve_bar(id)
+
+    }
 }

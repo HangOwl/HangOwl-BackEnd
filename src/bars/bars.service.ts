@@ -74,8 +74,12 @@ export class BarsService{
     async edit_bar(id,edit_content)
     {
         //editing bar procedure
-           
-        return bar
+        if( edit_content.hasOwnProperty('Password') )
+        {
+          edit_content.salt = await bcrypt.genSalt(10)
+          edit_content.Password = await bcrypt.hash(edit_content.Password , edit_content.salt )
+        }
+        
     }
 
     async bar_profile(id): Promise<Bar | undefined>
@@ -116,7 +120,7 @@ export class BarsService{
       const updatedBar = await this.bar_profile(id);
       updatedBar.AdditionalPicPath.push(filename);
       updatedBar.save();
-      return filename;
+      return updatedBar.AdditionalPicPath;
     }
 
     async profile_picture_add(id, filename)
@@ -125,8 +129,26 @@ export class BarsService{
       const updatedBar = await this.bar_profile(id);
       updatedBar.ProfilePicPath = filename;
       updatedBar.save()
-      return updatedBar;
+      return updatedBar.ProfilePicPath;
     }
 
+    async additonal_picture_remove(id, filename)
+    {
+      // add additional picture
+      console.log ("additional pic remove")
+      console.log (id)
+      console.log (filename)
+      let updatedBar = await this.bar_profile(id);
+      await updatedBar.updateOne({ $pull: {"AdditionalPicPath": filename } } );
+      console.log(updatedBar.AdditionalPicPath)
+      
+      return updatedBar.AdditionalPicPath;
+    }
 
+    async approve_bar(id)
+    {
+      // approve bar , id is string of bar_id
+      
+    }
+    
 }
