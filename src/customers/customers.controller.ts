@@ -32,6 +32,11 @@ export class CustomersController {
         if(current_user._id != id){
             return "userId not match"
         }
+        /*
+        if(current_user.Role != 0){
+            return "You are not customer"
+        }
+        */
     return this.customerservice.customer_data(id);
     }
 
@@ -43,6 +48,11 @@ export class CustomersController {
         if(current_user._id != id){
             return "userId not match"
         }
+        /*
+        if(current_user.Role != 0){
+            return "You are not customer"
+        }
+        */
     return this.customerservice.customer_favbars(id);
     }
 
@@ -54,10 +64,15 @@ export class CustomersController {
         if(current_user._id != id){
             return "userId not match"
         }
+        /*
+        if(current_user.Role != 0){
+            return "You are not customer"
+        }
+        */
         if(req.body.barId == null){
             return null
         }
-        //check userId
+        //check barId
         this.barservice.bar_profile(req.body.barId)
         return this.customerservice.add_favbars(id, req.body.barId)
     }
@@ -70,6 +85,11 @@ export class CustomersController {
         if(current_user._id != cusId){
             return "userId not match"
         }
+        /*
+        if(current_user.Role != 0){
+            return "You are not customer"
+        }
+        */
         return this.customerservice.remove_favbars(cusId, barId)        
     }
 
@@ -81,6 +101,11 @@ export class CustomersController {
         if(current_user._id != id){
             return "userId not match"
         }
+        /*
+        if(current_user.Role != 0){
+            return "You are not customer"
+        }
+        */
     return this.customerservice.edit_customer(id, req.body);
     }
 
