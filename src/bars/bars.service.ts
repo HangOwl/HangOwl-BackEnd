@@ -70,7 +70,6 @@ export class BarsService{
         return result.id as string;
     }
   
-
     async edit_bar(id,edit_content)
     {
         //editing bar procedure

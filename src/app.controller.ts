@@ -5,6 +5,7 @@ import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
 import { JWTUtil } from 'src/auth/JWTUtil';
+
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService ,
