@@ -7,10 +7,12 @@ import { BarsController } from './bars/bars.controller';
 import { BarsModule } from './bars/bars.module';
 import { CustomersController } from './customers/customers.controller';
 import { CustomersModule } from './customers/customers.module';
+import { ReservationsController } from './reservations/reservations.controller';
+import { ReservationsModule} from './reservations/reservations.module';
 
 @Module({
-  imports: [AuthModule, UsersModule , BarsModule, CustomersModule ],
-  controllers: [AppController , BarsController, CustomersController ],
+  imports: [AuthModule, UsersModule , BarsModule, CustomersModule, ReservationsModule ],
+  controllers: [AppController , BarsController, CustomersController, ReservationsController ],
   providers: [AppService],
 })
 export class AppModule {}
