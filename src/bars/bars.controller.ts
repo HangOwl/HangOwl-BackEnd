@@ -6,23 +6,25 @@ import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { editFileName, imageFileFilter } from './file-upload.utils';
 import { type } from 'os';
+import { BarMapper } from './bars.mapper';
 @Controller('bars')
 export class BarsController {
 
     constructor(private barservice: BarsService ,
-                private readonly jwtUtil: JWTUtil , ) {}
+                private readonly jwtUtil: JWTUtil , 
+                private barmapper: BarMapper ) {}
     @Get()
-    get_list_bars( @Query('search') search ): any {
+    async get_list_bars( @Query('search') search ) {
         if( search && search != "") {
-            return this.barservice.bar_search(search); }
+            return this.barmapper.object_customerview(await this.barservice.bar_search(search)); 
+        }
         else {
-            return this.barservice.list_bars()
+            return this.barmapper.object_customerview(await this.barservice.list_bars()); 
         }
     }
     
     @Post()
     add_BAR( @Request() req ): any {
-        console.log("addbar");
         //return this.barservice.add_bar();
         const payload = { 'Email' : req.body.Email , 'Password' : req.body.Password ,
                           'BarName' : req.body.BarName , 'LineID' : req.body.LineID , 'OpenTime' : req.body.OpenTime , 
@@ -30,17 +32,25 @@ export class BarsController {
                           'BarDescription' : req.body.BarDescription , 'BarRule' : req.body.BarRule }
         //check if Value is Null
         for (const payloadKey of Object.keys(payload)) {
-            if( payload[payloadKey] == null)
+            if( payload[payloadKey] == null || payload[payloadKey] == '' )
             {
-                return null
+                return payloadKey.concat(' ' , 'can not be null.')
             }
         }
         return this.barservice.add_bar(payload)
     }
 
     @Get(':id')
-    get_certain_bar(@Param('id') id ): any{
-        return this.barservice.bar_profile(id);
+    async get_certain_bar(@Param('id') id ) {
+        return  this.barmapper.customerview(await this.barservice.bar_profile(id) ); 
+    }
+    
+    @UseGuards(JwtAuthGuard)
+    @Get(':id/profile')
+    async get_certain_bar_profile(@Param('id') id , @Headers('Authorization') auth: string ) {
+      const current_user = this.jwtUtil.decode(auth);
+      if( current_user._id  != id ) return "Bar id and editer id not matched"
+      else return  this.barmapper.barview(await this.barservice.bar_profile(id) ); 
     }
 
     @UseGuards(JwtAuthGuard)

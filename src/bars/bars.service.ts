@@ -33,13 +33,13 @@ export class BarsService{
         const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if ( ! re.test(String(bar.Email).toLowerCase()) ) 
           // Bad email format
-          return null
+          return 'Bad email format.'
         if ( bar.OpenTime.length != 4 || bar.CloseTime.length != 4 )
           // Bad time format
-          return null
+          return 'Bad time format.'
         if ( typeof bar.CloseWeekDay != 'object' || bar.CloseWeekDay.length != 7 )
           // Bad Close week Days format
-          return null
+          return 'Bad CloseWeekDay format.'
         
         // Generate encrpte password
         bar.salt = await bcrypt.genSalt(10)
@@ -104,7 +104,7 @@ export class BarsService{
       //search_text is Barname
       let bars;
       try{
-      bars = await this.barModel.find({ BarName: { $regex: search_text, $options: "i" } });
+      bars = await this.barModel.find({ BarName: { $regex: search_text, $options: "i" } , "AdminApproved":true });
       }catch(error){
         throw new NotFoundException('Could not find bar.');
       }if (!bars) {
