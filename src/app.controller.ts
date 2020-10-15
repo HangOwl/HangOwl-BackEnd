@@ -1,4 +1,4 @@
-import { Controller, Request, Get , Post, UseGuards , Headers} from '@nestjs/common';
+import { Controller, Request, Get , Post, UseGuards , Headers , Param , HttpStatus , Res } from '@nestjs/common';
 import { AppService } from './app.service';
 import { AuthGuard } from '@nestjs/passport';
 import { LocalAuthGuard } from './auth/local-auth.guard';
@@ -15,6 +15,15 @@ export class AppController {
   @Get()
   getHello(): any {
     return "Hello World"
+  }
+
+  @Get('pictures/:imagename')
+  getImage(@Param('imagename') image, @Res() res) {
+    const response = res.sendFile(image, { root: 'uploads' });
+    return {
+      status: HttpStatus.OK,
+      data: response,
+    };
   }
 
   @UseGuards(LocalAuthGuard)

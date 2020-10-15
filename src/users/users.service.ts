@@ -1,39 +1,26 @@
-import { Injectable } from '@nestjs/common';
-
-export type User = any;
-
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from './users.model';
+import { UsersModule } from './users.module';
+import { Model } from 'mongoose'
 @Injectable()
 export class UsersService {
   private readonly users: User[];
-
-  constructor() {
-    this.users = [
-      {
-        id: 1,
-        Email: 'john',
-        Password: 'changeme',
-        Role: 1 ,
-        Detail: 'Hello'
-      },
-      {
-        id: 2,
-        Email: 'chris',
-        Password: 'secret',
-        Role: 2 ,
-        Detail: 'Hello'
-      },
-      {
-        id: 3,
-        Email: 'maria',
-        Password: 'guess',
-        Role: 3 ,
-        Detail: 'Hello'
-      },
-    ];
-  }
+  constructor(
+    @InjectModel('User') private readonly userModel: Model<User>
+    ) {}
+  
 
   // if has database ( need to return userData , password ,salt )
-  async findOne(email: string): Promise<User | undefined> {
-    return this.users.find(user => user.Email === email );
+  async findOne(email: string): Promise<User> {
+    let user;
+    try{
+      user = await this.userModel.findOne({'Email':email});
+    }catch(error){
+      throw new NotFoundException('Could not find product.');
+    }if (!user) {
+      throw new NotFoundException('Could not find product.');
+    }
+    return user;
   }
 }
