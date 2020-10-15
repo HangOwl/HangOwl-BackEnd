@@ -37,6 +37,7 @@ export class AdminsService {
         Name: admin.AdminName,
       });
       const result = await newAdmin.save();
+      console.log(result)
       //email procedure
       return result.id as string;
   }
