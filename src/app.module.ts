@@ -16,12 +16,12 @@ import { MulterModule } from '@nestjs/platform-express';
 import { AdminsController } from './admins/admins.controller'
 import { AdminsModule } from './admins/admins.module';
 @Module({
-  imports: [AuthModule, UsersModule , BarsModule, AdminsModule ,
+  imports: [AuthModule, UsersModule , BarsModule, AdminsModule , ReservationsModule, CustomersModule,
     MongooseModule.forRoot('mongodb+srv://DrunkOrca:I4XfDlPwPXpBjjXO@cluster0.t25ry.gcp.mongodb.net/HangOwl?retryWrites=true&w=majority'), 
     MulterModule.register({
       dest: './files',
     }) ],
-  controllers: [AppController , BarsController , AdminsController],
+  controllers: [AppController , BarsController , AdminsController, ReservationsController, CustomersController],
   providers: [AppService],
   
 })
