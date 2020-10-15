@@ -32,8 +32,8 @@ export class CustomersService{
         ];
       }
     
-      async add_customer(customer): Promise<Customer | undefined>
-      {
+    async add_customer(customer): Promise<Customer | undefined>
+    {
         //payload in customer is 'Email', 'Password', 'Name'
         //Doesn't have Role, EmailVerify, CancelAccount, Reservations, Favourites
         //Set default
@@ -70,15 +70,15 @@ export class CustomersService{
         return this.customers.find(customer => customer.userId === id).Favourites;
     } 
 
-    async add_favbars(userId, barId): Promise<Customer | undefined>
+    async add_favbars(cusId, barId): Promise<Customer | undefined>
     {
-        //userId is string , barId is string
+        //cusId is string , barId is string
         return "add favorite bar complete";
     }
 
-    async remove_favbars(userId, barID): Promise<Customer | undefined>
+    async remove_favbars(cusId, barId): Promise<Customer | undefined>
     {
-        //userId is string , barId is string
+        //cusId is string , barId is string
         return "remove favorite bar complete";
     }
 

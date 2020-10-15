@@ -1,9 +1,7 @@
-import { Controller , Get, Param, Post, Request, UseGuards, Headers, Delete, Patch} from '@nestjs/common'
-import { CustomersService } from './customers.service'
-import { AppService } from 'src/app.service';
+import { Controller , Get, Param, Post, Request, UseGuards, Headers, Delete, Patch} from '@nestjs/common';
+import { CustomersService } from './customers.service';
 import { JWTUtil } from 'src/auth/JWTUtil';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { identity } from 'rxjs';
 import { BarsService } from 'src/bars/bars.service';
 
 @Controller('customers')
@@ -14,7 +12,7 @@ export class CustomersController {
                 private readonly barservice: BarsService) {}
 
     @Post()
-    add_new_customer( @Request() req ): any {
+    add_new_customer(@Request() req): any {
         const payload = {'Email' : req.body.Email , 'Password' : req.body.Password, 'Name' : req.body.Name}
         //check if Value is Null
         for (const payloadKey of Object.keys(payload)) {
@@ -29,6 +27,7 @@ export class CustomersController {
     @UseGuards(JwtAuthGuard)
     @Get(':id')
     get_certain_customers(@Param('id') id, @Headers('Authorization') auth : string): any{
+        //check userId
         const current_user = this.jwtUtil.decode(auth); // id , Role
         if(current_user._id != id){
             return "userId not match"
@@ -39,6 +38,7 @@ export class CustomersController {
     @UseGuards(JwtAuthGuard)
     @Get(':id/favbars')
     get_favourite_bar(@Param('id') id, @Headers('Authorization') auth : string): any{
+        //check userId
         const current_user = this.jwtUtil.decode(auth); // id , Role
         if(current_user._id != id){
             return "userId not match"
@@ -49,6 +49,7 @@ export class CustomersController {
     @UseGuards(JwtAuthGuard)
     @Post(':id/favbars')
     add_favorite_bar(@Param('id') id, @Request() req, @Headers('Authorization') auth : string ): any{
+        //check userId
         const current_user = this.jwtUtil.decode(auth); // id , Role
         if(current_user._id != id){
             return "userId not match"
@@ -56,23 +57,26 @@ export class CustomersController {
         if(req.body.barId == null){
             return null
         }
+        //check userId
         this.barservice.bar_profile(req.body.barId)
         return this.customerservice.add_favbars(id, req.body.barId)
     }
 
     @UseGuards(JwtAuthGuard)
-    @Delete(':userID/favbars/:barID')
-    remove_favorite_bar(@Param('userID') userId, @Param('barID') BarId, @Headers('Authorization') auth : string): any{
+    @Delete(':cusID/favbars/:barID')
+    remove_favorite_bar(@Param('cusID') cusId, @Param('barID') barId, @Headers('Authorization') auth : string): any{
+        //check userId
         const current_user = this.jwtUtil.decode(auth); // id , Role
-        if(current_user._id != userId){
+        if(current_user._id != cusId){
             return "userId not match"
         }
-        return this.customerservice.remove_favbars(userId, BarId)        
+        return this.customerservice.remove_favbars(cusId, barId)        
     }
 
     @UseGuards(JwtAuthGuard)
     @Patch(':id')
     update_customer_data(@Param('id') id, @Request() req, @Headers('Authorization') auth : string): any{
+        //check userId
         const current_user = this.jwtUtil.decode(auth); // id , Role
         if(current_user._id != id){
             return "userId not match"
@@ -80,5 +84,5 @@ export class CustomersController {
     return this.customerservice.edit_customer(id, req.body);
     }
 
-    
+
 }
