@@ -21,7 +21,7 @@ export class BarsController {
         else {
             return this.barmapper.object_customerview(await this.barservice.list_bars()); 
         }
-    }
+    } 
     
     @Post()
     add_BAR( @Request() req ): any {
@@ -49,7 +49,7 @@ export class BarsController {
     @Get(':id/profile')
     async get_certain_bar_profile(@Param('id') id , @Headers('Authorization') auth: string ) {
       const current_user = this.jwtUtil.decode(auth);
-      if( current_user._id  != id ) return "Bar id and editer id not matched"
+      if( current_user._id  != id ) return "Bar id and viewer id not matched"
       else return  this.barmapper.barview(await this.barservice.bar_profile(id) ); 
     }
 
@@ -57,8 +57,8 @@ export class BarsController {
     @Patch(':id')
     edit_certain_bar(@Headers('Authorization') auth: string , @Request() req  , @Param('id') id ): any{
         const current_user = this.jwtUtil.decode(auth);
-        if( current_user._id  != id ) return "Bar id and editer id not matched"
-        return this.barservice.edit_bar(current_user.userId , req.body)
+        if( current_user._id  != id ) return "Bar id and editor id not matched"
+        return this.barservice.edit_bar(current_user._id , req.body)
     }
 
     @UseGuards(JwtAuthGuard)
@@ -74,7 +74,7 @@ export class BarsController {
     )
     async uploadedFile(@UploadedFile() file , @Param('id') id , @Headers('Authorization') auth: string , @Query('profile') profile ) {
       const current_user = this.jwtUtil.decode(auth);
-      if(current_user._id != id) return "Id bar and uploader id not matched"
+      if(current_user._id != id) return "Bar id and uploader id not matched"
       if(profile == 'true') this.barservice.profile_picture_add(id , file.filename)
       else this.barservice.additonal_picture_add(id , file.filename)
       return file.filename
@@ -84,9 +84,13 @@ export class BarsController {
     @Delete(':id/pictures/:filename')
     async DeletePicture(@Param('id') id , @Headers('Authorization') auth: string , @Query('profile') profile , @Param('filename') filename) {
       const current_user = this.jwtUtil.decode(auth);
-      if(current_user._id != id) return "Id bar and uploader id not matched"
-      if(profile == 'true') this.barservice.profile_picture_add(id , '')
-      else this.barservice.additonal_picture_remove(id , filename )
+      if(current_user._id != id) return "Bar id and deleter id not matched"
+      if(profile == 'true') 
+      { 
+        this.barservice.profile_picture_add(id , '') 
+        return 'Delete success.'
+      }
+      else return this.barservice.additonal_picture_remove(id , filename )
     }
 
     @UseGuards(JwtAuthGuard)

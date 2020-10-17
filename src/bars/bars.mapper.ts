@@ -18,7 +18,7 @@ export class BarMapper {
     async barview(bar) {
         const allowed = ['AdditionalPicPath' , 'CloseWeekDay' , '_id' , 'Role' , 'BarName' , 'Email' ,
                          'ProfilePicPath' , 'LineID' , 'OpenTime' , 'CloseTime' , 'Address' , 'AdminApproved' , 'BarDescription' , 'BarRule']
-        const payload = {};
+        const payload = {}; 
         for (var payloadKey in bar) {
             if( allowed.includes(payloadKey) )
             {
