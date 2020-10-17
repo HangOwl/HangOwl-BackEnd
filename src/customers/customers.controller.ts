@@ -3,13 +3,17 @@ import { CustomersService } from './customers.service';
 import { JWTUtil } from 'src/auth/JWTUtil';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { BarsService } from 'src/bars/bars.service';
+import { CustomerMapper } from './customers.mapper';
+import { BarMapper } from 'src/bars/bars.mapper';
 
 @Controller('customers')
 export class CustomersController {
 
     constructor(private readonly customerservice: CustomersService ,
                 private readonly jwtUtil: JWTUtil , 
-                private readonly barservice: BarsService) {}
+                private readonly barservice: BarsService , 
+                private customermapper: CustomerMapper , 
+                private barmapper: BarMapper ) {}
 
     @Post()
     add_new_customer(@Request() req): any {
@@ -18,7 +22,7 @@ export class CustomersController {
         for (const payloadKey of Object.keys(payload)) {
             if( payload[payloadKey] == null)
             {
-                return null
+                return payloadKey.concat(' ' , 'can not be null.')
             }
         }
         return this.customerservice.add_customer(payload)
@@ -29,39 +33,32 @@ export class CustomersController {
     get_certain_customers(@Param('id') id, @Headers('Authorization') auth : string): any{
         //check userId
         const current_user = this.jwtUtil.decode(auth); // id , Role
-        if(current_user._id != id){
+        if(current_user._id != id && current_user.Role != 1 ){
             return "userId not match"
         }
-        /*
-        if(current_user.Role != 0){
-            return "You are not customer"
-        }
-        */
-    return this.customerservice.customer_data(id);
+    return this.customermapper.customerview ( this.customerservice.customer_data(id) ) ;
+
     }
 
     @UseGuards(JwtAuthGuard)
     @Get(':id/favbars')
-    get_favourite_bar(@Param('id') id, @Headers('Authorization') auth : string): any{
+    async get_favourite_bar(@Param('id') id, @Headers('Authorization') auth : string) {
         //check userId
         const current_user = this.jwtUtil.decode(auth); // id , Role
-        if(current_user._id != id){
+        if(current_user._id != id && current_user.Role != 1 ){
             return "userId not match"
         }
-        /*
-        if(current_user.Role != 0){
-            return "You are not customer"
-        }
-        */
-    return this.customerservice.customer_favbars(id);
+    return this.barmapper.object_customerview( await this.customerservice.customer_favbars(id) );
+    //return this.customerservice.customer_favbars(id) ;
+
     }
 
     @UseGuards(JwtAuthGuard)
     @Post(':id/favbars')
-    add_favorite_bar(@Param('id') id, @Request() req, @Headers('Authorization') auth : string ): any{
+    async add_favorite_bar(@Param('id') id, @Request() req, @Headers('Authorization') auth : string ) {
         //check userId
         const current_user = this.jwtUtil.decode(auth); // id , Role
-        if(current_user._id != id){
+        if(current_user._id != id && current_user.Role != 1 ){
             return "userId not match"
         }
         /*
@@ -71,43 +68,36 @@ export class CustomersController {
         */
         if(req.body.barId == null){
             return null
-        }
-        //check barId
-        this.barservice.bar_profile(req.body.barId)
-        return this.customerservice.add_favbars(id, req.body.barId)
-    }
+        } 
+        //check userId
+        await this.barservice.bar_profile(req.body.barId)
+        return this.customerservice.add_favbars(id, req.body.barId) 
 
+    }
+    
     @UseGuards(JwtAuthGuard)
     @Delete(':cusID/favbars/:barID')
-    remove_favorite_bar(@Param('cusID') cusId, @Param('barID') barId, @Headers('Authorization') auth : string): any{
+    async remove_favorite_bar(@Param('cusID') cusId, @Param('barID') barId, @Headers('Authorization') auth : string) {
         //check userId
         const current_user = this.jwtUtil.decode(auth); // id , Role
-        if(current_user._id != cusId){
+        if(current_user._id != cusId && current_user.Role != 1 ){
             return "userId not match"
         }
-        /*
-        if(current_user.Role != 0){
-            return "You are not customer"
-        }
-        */
-        return this.customerservice.remove_favbars(cusId, barId)        
-    }
 
-    @UseGuards(JwtAuthGuard)
-    @Patch(':id')
-    update_customer_data(@Param('id') id, @Request() req, @Headers('Authorization') auth : string): any{
-        //check userId
-        const current_user = this.jwtUtil.decode(auth); // id , Role
-        if(current_user._id != id){
-            return "userId not match"
-        }
-        /*
-        if(current_user.Role != 0){
-            return "You are not customer"
-        }
-        */
-    return this.customerservice.edit_customer(id, req.body);
-    }
+        return  await this.customerservice.remove_favbars(cusId, barId)    
+    } 
+
+//    @UseGuards(JwtAuthGuard)
+//    @Patch(':id')
+//    update_customer_data(@Param('id') id, @Request() req, @Headers('Authorization') auth : string): any{
+//        //check userId
+//        const current_user = this.jwtUtil.decode(auth); // id , Role
+//        if(current_user._id != id){
+//            return "userId not match"
+//        }
+//    return this.customerservice.edit_customer(id, req.body);
+//    }
+
 
 
 }

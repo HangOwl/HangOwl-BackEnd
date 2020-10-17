@@ -1,39 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Customer } from './customers.model';
+import { User } from 'src/users/users.model';
+import { CustomersModule } from './customers.module';
+import { Model } from 'mongoose'
+import { Bar } from 'src/bars/bars.model';
 
 const bcrypt = require('bcrypt')
 
-export type Customer = any
+
 @Injectable()
 export class CustomersService{
     private readonly customers: Customer[];
-    constructor() {
-        this.customers = [
-          {
-            userId: '11',
-            Name: 'tham',
-            Email: 'tham_za@xx.th',
-            Password: 'thamza43',
-            Favourites: ['ChangChang', 'Alibaba', 'Undorm']
-          },
-          {
-            userId: '12',
-            Name: 'kenchi',
-            Email: 'kenchichy@xx.th',
-            Password: 'Kken123',
-            Favourites: ['ChangChang', 'Undorm']
-          },
-          {
-            userId: '13',
-            Name: 'aurora',
-            Email: 'a0378@xx.th',
-            Password: '123',
-            Favourites: ['Alibaba', 'Pterpan']
-          },
-        ];
-      }
+    constructor(
+      @InjectModel('User') private readonly customerModel: Model<Customer>,
+      @InjectModel('User') private readonly userModel: Model<User>,
+      @InjectModel('User') private readonly barModel: Model<Bar>
+    ) {}
     
-    async add_customer(customer): Promise<Customer | undefined>
+    async add_customer(customer)
     {
+        const user = await this.userModel.findOne({'Email':customer.Email});
+        if(user)
+          return "Email already exist.";
         //payload in customer is 'Email', 'Password', 'Name'
         //Doesn't have Role, EmailVerify, CancelAccount, Reservations, Favourites
         //Set default
@@ -46,51 +35,105 @@ export class CustomersService{
         const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if ( ! re.test(String(customer.Email).toLowerCase()) ) 
           //Bad email format
-          return null
+          return "Bad email format"
         //Generate encrpte password
-        customer.Salt = await bcrypt.genSalt(10)
+        customer.Salt = await bcrypt.genSalt(10) 
         customer.Password = await bcrypt.hash(customer.Password , customer.Salt )
         //adding customer procedure
-        
+        const newCustomer = new this.customerModel({
+          Email: customer.Email,
+          Password: customer.Password,
+          Salt: customer.Salt,
+          Role: customer.Role,
+          Name: customer.Name,
+          EmailVerify: customer.EmailVerify,
+          Reservations: customer.Reservations,
+          Favourites: customer.Favourites,
+        });
+        const result = await newCustomer.save();
+        console.log(result);
         //email procedure
-        return customer
+        return result.id as string;
     }
 
-    async customer_data(id): Promise<Customer | undefined>
+    async customer_data(id)
     {
         //return customer that match with id
         //id is string
-        return this.customers.find(customer => customer.userId === id);
+        let customer;
+        try {
+          customer = await this.customerModel.findById(id);
+        }catch(error){
+          throw new NotFoundException('Could not find customer.');
+        }
+        if (!customer) {
+          throw new NotFoundException('Could not find customer.');
+        }
+        if(customer.Role != 0){
+          return "This is not customerId"
+        }
+        return customer;
     } 
 
-    async customer_favbars(id): Promise<Customer | undefined>
-    {
-        //return list of favourite bar's customer that match with id
-        //id is string
-        return this.customers.find(customer => customer.userId === id).Favourites;
-    } 
+     async customer_favbars(id): Promise<Customer | undefined>
+     {
+         //return list of favourite bar's customer that match with id
+         //id is string
+         let customer;
+         customer = await this.customer_data(id);
+         let bars;
+         bars = await this.barModel.find({
+           '_id' : {$in: customer.Favourites}
+         });
+         return bars;
+     } 
 
-    async add_favbars(cusId, barId): Promise<Customer | undefined>
+    async add_favbars(cusId, barId)
     {
         //cusId is string , barId is string
-        return "add favorite bar complete";
+        let bar;
+        try {
+          bar = await this.barModel.findById(barId);
+        }catch(error){
+          throw new NotFoundException('Could not find bar.');
+        }
+        if (!bar) {
+          throw new NotFoundException('Could not find bar.');
+        }
+        if (bar.Role != 1){
+          return "This is not barId";
+        }
+        let updatedCustomer;
+        updatedCustomer = await this.customer_data(cusId);
+        if (updatedCustomer.Favourites.includes(barId)){
+          return "This bar already exists";
+        }
+        updatedCustomer.Favourites.push(barId);
+        updatedCustomer.save();
+        return updatedCustomer.Favourites;
     }
 
-    async remove_favbars(cusId, barId): Promise<Customer | undefined>
+    async remove_favbars(cusId, barId)
     {
-        //cusId is string , barId is string
-        return "remove favorite bar complete";
+      //cusId is string , barId is string
+      let updatedCustomer;
+      updatedCustomer = await this.customer_data(cusId); 
+      await updatedCustomer.updateOne({ $pull: {"Favourites": barId } } );
+      updatedCustomer.save()
+      console.log(updatedCustomer)
+      return updatedCustomer.Favourites; 
     }
 
-    async edit_customer(id, edit_data): Promise<Customer | undefined>
+    async edit_customer(id, edit_data)
     {
         //id is string
         //Edit Password
-        if(edit_data.Password){
+        if(edit_data.hasOwnProperty('Password')){
+          if(edit_data.hasOwnProperty('Salt')) return "Invalid content"
           edit_data.Salt = await bcrypt.genSalt(10)
           edit_data.Password = await bcrypt.hash(edit_data.Password , edit_data.Salt )
         }
-        return this.customers.find(customer => customer.userId === id);
+        //return this.customers.find(customer => customer.userId === id);
     }
 
 }

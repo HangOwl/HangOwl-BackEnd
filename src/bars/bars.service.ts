@@ -15,7 +15,7 @@ export class BarsService{
       @InjectModel('User') private readonly userModel: Model<User>
       ) {}
     async list_bars()  {
-        const bars = await this.barModel.find({"AdminApproved":true}).exec();
+        const bars = await this.barModel.find({"AdminApproved":true, "Role":1}).exec();
         return bars;
     }
     async add_bar(bar): Promise<string>
@@ -73,15 +73,26 @@ export class BarsService{
     async edit_bar(id,edit_content)
     {
         //editing bar procedure
+        //
         if( edit_content.hasOwnProperty('Password') )
         {
-          edit_content.salt = await bcrypt.genSalt(10)
+          if(edit_content.hasOwnProperty('Salt')) return "Invalid content"
+          edit_content.Salt = await bcrypt.genSalt(10)
           edit_content.Password = await bcrypt.hash(edit_content.Password , edit_content.salt )
         }
-        
+        const editable = [ 'BarName' , 'OpenTime' , 'CloseTime' , 'Salt' , 'Password' , 'CloseWeekDay' , 'LineID' , 'Email' , 'Address' , 'BarDescription' ,
+                           'BarRule']
+        let updatedBar = await this.bar_profile(id);
+        for (var editkey in edit_content ) {
+          if( editable.includes(editkey) )
+          {
+            updatedBar[editkey] = edit_content[editkey]
+          }
+        }
+        updatedBar.save()
+        return "Edit complete"
     }
-
-    async bar_profile(id): Promise<Bar | undefined>
+    async bar_profile(id)
     {
         //return  bar that match with id
         //id is string
@@ -93,6 +104,9 @@ export class BarsService{
         }
         if (!bar) {
           throw new NotFoundException('Could not find bar.');
+        }
+        if(bar.Role != 1){
+          return "This is not barId";
         }
         return bar;
     }
@@ -133,10 +147,7 @@ export class BarsService{
 
     async additonal_picture_remove(id, filename)
     {
-      // add additional picture
-      console.log ("additional pic remove")
-      console.log (id)
-      console.log (filename)
+      // remove additional picture
       let updatedBar = await this.bar_profile(id);
       await updatedBar.updateOne({ $pull: {"AdditionalPicPath": filename } } );
       updatedBar.save()
