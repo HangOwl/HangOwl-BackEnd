@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './users.model';
 import { UsersModule } from './users.module';
-import { Model } from 'mongoose'
+import { Model } from 'mongoose' 
 @Injectable()
 export class UsersService {
   private readonly users: User[];
@@ -22,5 +22,13 @@ export class UsersService {
       throw new NotFoundException('Could not find product.');
     }
     return user;
+  }
+  async findEmail (email : string){
+    let user;
+    user = await this.userModel.findOne({'Email':email});
+        if(user)
+          return true; 
+        else
+          return false;
   }
 }

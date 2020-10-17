@@ -15,11 +15,9 @@ export class ReservationsController {
     @Post()
     add_Reserve( @Request() req, @Headers('Authorization') auth : string ): any {
         const current_user = this.jwtUtil.decode(auth); // id , Role
-        /*
         if(current_user.Role != 0){
             return "You are not customer"
-        }
-        */
+        } 
         const payload = { 'cusId' : current_user._id ,'barId' : req.body.barId ,'DateReserve' : req.body.DateReserve,
                           'NumberOfPeople' : req.body.NumberOfPeople , 'Postscript' : req.body.Postscript}
         //check BarId
@@ -28,10 +26,10 @@ export class ReservationsController {
         for (const payloadKey of Object.keys(payload)) {
             if( payload[payloadKey] == null && payloadKey!="Postscript")
             {
-                return null
+                return payloadKey.concat(' ' , 'can not be null.')
             }
         }
-        return this.reservationservice.add_reserve(payload)
+        return this.reservationservice.add_reserve(payload) 
     }
 
     @UseGuards(JwtAuthGuard)         

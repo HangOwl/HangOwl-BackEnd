@@ -36,7 +36,7 @@ export class BarsController {
             {
                 return payloadKey.concat(' ' , 'can not be null.')
             }
-        }
+        } 
         return this.barservice.add_bar(payload)
     }
 
@@ -57,7 +57,7 @@ export class BarsController {
     @Patch(':id')
     edit_certain_bar(@Headers('Authorization') auth: string , @Request() req  , @Param('id') id ): any{
         const current_user = this.jwtUtil.decode(auth);
-        if( current_user._id  != id ) return "Bar id and editor id not matched"
+        if( current_user._id  != id && current_user.Role != 0 ) return "Bar id and editor id not matched"
         return this.barservice.edit_bar(current_user._id , req.body)
     }
 
@@ -74,7 +74,7 @@ export class BarsController {
     )
     async uploadedFile(@UploadedFile() file , @Param('id') id , @Headers('Authorization') auth: string , @Query('profile') profile ) {
       const current_user = this.jwtUtil.decode(auth);
-      if(current_user._id != id) return "Bar id and uploader id not matched"
+      if(current_user._id != id && current_user.Role != 0  ) return "Bar id and uploader id not matched"
       if(profile == 'true') this.barservice.profile_picture_add(id , file.filename)
       else this.barservice.additonal_picture_add(id , file.filename)
       return file.filename
@@ -84,7 +84,7 @@ export class BarsController {
     @Delete(':id/pictures/:filename')
     async DeletePicture(@Param('id') id , @Headers('Authorization') auth: string , @Query('profile') profile , @Param('filename') filename) {
       const current_user = this.jwtUtil.decode(auth);
-      if(current_user._id != id) return "Bar id and deleter id not matched"
+      if(current_user._id != id && current_user.Role != 0 ) return "Bar id and deleter id not matched"
       if(profile == 'true') 
       { 
         this.barservice.profile_picture_add(id , '') 
@@ -98,7 +98,7 @@ export class BarsController {
     async approve_bar(@Param('id') id , @Headers('Authorization') auth: string ) {
       const current_user = this.jwtUtil.decode(auth);
       if(current_user.Role != 2) return "You are not Adminnnn"
-      else this.barservice.approve_bar(id)
+      else this.barmapper.barview ( await this.barservice.approve_bar(id) ) 
 
     }
 }

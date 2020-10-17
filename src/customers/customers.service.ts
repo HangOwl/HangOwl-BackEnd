@@ -6,6 +6,7 @@ import { CustomersModule } from './customers.module';
 import { Model } from 'mongoose'
 import { Bar } from 'src/bars/bars.model';
 
+
 const bcrypt = require('bcrypt')
 
 
@@ -15,14 +16,14 @@ export class CustomersService{
     constructor(
       @InjectModel('User') private readonly customerModel: Model<Customer>,
       @InjectModel('User') private readonly userModel: Model<User>,
-      @InjectModel('User') private readonly barModel: Model<Bar>
+      @InjectModel('User') private readonly barModel: Model<Bar>,  
     ) {}
     
     async add_customer(customer)
     {
-        const user = await this.userModel.findOne({'Email':customer.Email});
-        if(user)
-          return "Email already exist.";
+        //check if email already exist
+        if (await this.userModel.findOne({'Email':customer.Email}))
+          return "Email already exist";
         //payload in customer is 'Email', 'Password', 'Name'
         //Doesn't have Role, EmailVerify, CancelAccount, Reservations, Favourites
         //Set default
@@ -120,8 +121,8 @@ export class CustomersService{
       updatedCustomer = await this.customer_data(cusId); 
       await updatedCustomer.updateOne({ $pull: {"Favourites": barId } } );
       updatedCustomer.save()
-      console.log(updatedCustomer)
-      return updatedCustomer.Favourites; 
+      const result = await updatedCustomer.save()
+      return result; 
     }
 
     async edit_customer(id, edit_data)
@@ -133,7 +134,24 @@ export class CustomersService{
           edit_data.Salt = await bcrypt.genSalt(10)
           edit_data.Password = await bcrypt.hash(edit_data.Password , edit_data.Salt )
         }
+        const editable = [ 'Email', 'Name' , 'CancelAccount' , 'Salt' , 'Password']
+        if(edit_data.Email) {
+          //check if email already exist
+          if (await this.userModel.findOne({'Email':edit_data.Email}))
+          return "Email already exist";
+        }
         //return this.customers.find(customer => customer.userId === id);
+        let updatedCustomer = await this.customer_data(id);
+        //editing bar procedure
+        //
+        for (var editkey in edit_data ) {
+          if( editable.includes(editkey) )
+          {
+            updatedCustomer[editkey] = edit_data[editkey]
+          }
+        } 
+        const result = await updatedCustomer.save();
+        return result; 
     }
 
 }

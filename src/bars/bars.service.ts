@@ -12,7 +12,7 @@ export class BarsService{
     private readonly bars: Bar[];
     constructor(
       @InjectModel('User') private readonly barModel: Model<Bar>,
-      @InjectModel('User') private readonly userModel: Model<User>
+      @InjectModel('User') private readonly userModel: Model<User> ,
       ) {}
     async list_bars()  {
         const bars = await this.barModel.find({"AdminApproved":true, "Role":1}).exec();
@@ -64,7 +64,7 @@ export class BarsService{
           BarRule : bar.BarRule,
           Reservations: [],
         });
-        const result = await newBar.save();
+        const result = await newBar.save(); 
         console.log(result);
         //email procedure
         return result.id as string;
@@ -82,6 +82,9 @@ export class BarsService{
         }
         const editable = [ 'BarName' , 'OpenTime' , 'CloseTime' , 'Salt' , 'Password' , 'CloseWeekDay' , 'LineID' , 'Email' , 'Address' , 'BarDescription' ,
                            'BarRule']
+        if(edit_content.Email) { 
+          if ( await this.userModel.findOne({'Email':edit_content.Email}) ) return
+        } 
         let updatedBar = await this.bar_profile(id);
         for (var editkey in edit_content ) {
           if( editable.includes(editkey) )
@@ -89,8 +92,8 @@ export class BarsService{
             updatedBar[editkey] = edit_content[editkey]
           }
         }
-        updatedBar.save()
-        return "Edit complete"
+        const result = await updatedBar.save()
+        return result
     }
     async bar_profile(id)
     {

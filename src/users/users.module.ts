@@ -9,3 +9,4 @@ import { UserSchema } from 'src/users/users.model'
   exports: [UsersService],
 })
 export class UsersModule {}
+

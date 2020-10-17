@@ -87,16 +87,16 @@ export class CustomersController {
         return  await this.customerservice.remove_favbars(cusId, barId)    
     } 
 
-//    @UseGuards(JwtAuthGuard)
-//    @Patch(':id')
-//    update_customer_data(@Param('id') id, @Request() req, @Headers('Authorization') auth : string): any{
-//        //check userId
-//        const current_user = this.jwtUtil.decode(auth); // id , Role
-//        if(current_user._id != id){
-//            return "userId not match"
-//        }
-//    return this.customerservice.edit_customer(id, req.body);
-//    }
+    @UseGuards(JwtAuthGuard)
+    @Patch(':id')
+    async update_customer_data(@Param('id') id, @Request() req, @Headers('Authorization') auth : string) {
+        //check userId
+        const current_user = this.jwtUtil.decode(auth); // id , Role
+       if(current_user._id != id && current_user.Role != 1  ){
+            return "userId not match"
+        }
+    return this.customermapper.customerview ( await this.customerservice.edit_customer(id, req.body) ) ;
+    }
 
 
 
