@@ -119,21 +119,33 @@ export class CustomersService{
       let updatedCustomer;
       updatedCustomer = await this.customer_data(cusId); 
       await updatedCustomer.updateOne({ $pull: {"Favourites": barId } } );
-      updatedCustomer.save()
-      console.log(updatedCustomer)
-      return updatedCustomer.Favourites; 
+      const result = await updatedCustomer.save()
+      return result;  
     }
 
-    async edit_customer(id, edit_data)
+    async edit_customer(id, edit_content)
     {
-        //id is string
-        //Edit Password
-        if(edit_data.hasOwnProperty('Password')){
-          if(edit_data.hasOwnProperty('Salt')) return "Invalid content"
-          edit_data.Salt = await bcrypt.genSalt(10)
-          edit_data.Password = await bcrypt.hash(edit_data.Password , edit_data.Salt )
+        //editing bar procedure
+        //
+        if( edit_content.hasOwnProperty('Password') )
+        {
+          if(edit_content.hasOwnProperty('Salt')) return "Invalid content"
+          edit_content.Salt = await bcrypt.genSalt(10)
+          edit_content.Password = await bcrypt.hash(edit_content.Password , edit_content.salt )
         }
-        //return this.customers.find(customer => customer.userId === id);
+        const editable = [ 'Name' , 'Salt' , 'Password' , 'Email'] 
+        if(edit_content.Email) {
+          if(await this.userModel.findOne({'Email':edit_content.Email})) return "Email already exists"
+        }
+        let updatedCustomer = await this.customer_data(id);
+        for (var editkey in edit_content ) {
+          if( editable.includes(editkey) )
+          {
+            updatedCustomer[editkey] = edit_content[editkey]
+          }
+        }
+        const result = await updatedCustomer.save()
+        return result
     }
 
 }

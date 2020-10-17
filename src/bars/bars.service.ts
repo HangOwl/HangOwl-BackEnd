@@ -73,7 +73,7 @@ export class BarsService{
     async edit_bar(id,edit_content)
     {
         //editing bar procedure
-        //
+        
         if( edit_content.hasOwnProperty('Password') )
         {
           if(edit_content.hasOwnProperty('Salt')) return "Invalid content"
@@ -81,7 +81,10 @@ export class BarsService{
           edit_content.Password = await bcrypt.hash(edit_content.Password , edit_content.salt )
         }
         const editable = [ 'BarName' , 'OpenTime' , 'CloseTime' , 'Salt' , 'Password' , 'CloseWeekDay' , 'LineID' , 'Email' , 'Address' , 'BarDescription' ,
-                           'BarRule']
+                           'BarRule'] 
+        if(edit_content.Email) {
+          if(await this.userModel.findOne({'Email':edit_content.Email})) return "Email already exist."
+        }
         let updatedBar = await this.bar_profile(id);
         for (var editkey in edit_content ) {
           if( editable.includes(editkey) )
@@ -89,8 +92,8 @@ export class BarsService{
             updatedBar[editkey] = edit_content[editkey]
           }
         }
-        updatedBar.save()
-        return "Edit complete"
+        const result = await updatedBar.save()
+        return result
     }
     async bar_profile(id)
     {

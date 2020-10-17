@@ -55,10 +55,10 @@ export class BarsController {
 
     @UseGuards(JwtAuthGuard)
     @Patch(':id')
-    edit_certain_bar(@Headers('Authorization') auth: string , @Request() req  , @Param('id') id ): any{
+    async edit_certain_bar(@Headers('Authorization') auth: string , @Request() req  , @Param('id') id ) {
         const current_user = this.jwtUtil.decode(auth);
         if( current_user._id  != id ) return "Bar id and editor id not matched"
-        return this.barservice.edit_bar(current_user._id , req.body)
+        return  await this.barservice.edit_bar(current_user._id , req.body) 
     }
 
     @UseGuards(JwtAuthGuard)
