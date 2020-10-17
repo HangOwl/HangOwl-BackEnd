@@ -37,6 +37,7 @@ export class CustomersController {
             return "userId not match"
         }
     return this.customermapper.customerview ( this.customerservice.customer_data(id) ) ;
+
     }
 
     @UseGuards(JwtAuthGuard)
@@ -49,6 +50,7 @@ export class CustomersController {
         }
     return this.barmapper.object_customerview( await this.customerservice.customer_favbars(id) );
     //return this.customerservice.customer_favbars(id) ;
+
     }
 
     @UseGuards(JwtAuthGuard)
@@ -59,12 +61,18 @@ export class CustomersController {
         if(current_user._id != id && current_user.Role != 1 ){
             return "userId not match"
         }
+        /*
+        if(current_user.Role != 0){
+            return "You are not customer"
+        }
+        */
         if(req.body.barId == null){
             return null
         } 
         //check userId
         await this.barservice.bar_profile(req.body.barId)
         return this.customerservice.add_favbars(id, req.body.barId) 
+
     }
     
     @UseGuards(JwtAuthGuard)
@@ -75,6 +83,7 @@ export class CustomersController {
         if(current_user._id != cusId && current_user.Role != 1 ){
             return "userId not match"
         }
+
         return  await this.customerservice.remove_favbars(cusId, barId)    
     } 
 
@@ -88,6 +97,7 @@ export class CustomersController {
 //        }
 //    return this.customerservice.edit_customer(id, req.body);
 //    }
+
 
 
 }
