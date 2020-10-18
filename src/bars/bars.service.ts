@@ -18,6 +18,10 @@ export class BarsService{
         const bars = await this.barModel.find({"AdminApproved":true, "Role":1}).exec();
         return bars;
     }
+    async list_unapprove_bars()  {
+      const bars = await this.barModel.find({"AdminApproved":false, "Role":1}).exec();
+      return bars;
+  }
     async add_bar(bar): Promise<string>
     {
         const user = await this.userModel.findOne({'Email':bar.Email});

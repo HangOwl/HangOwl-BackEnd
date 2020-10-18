@@ -16,7 +16,7 @@ export class CustomersController {
                 private barmapper: BarMapper ) {}
 
     @Post()
-    add_new_customer(@Request() req): any {
+    async add_new_customer(@Request() req) {
         const payload = {'Email' : req.body.Email , 'Password' : req.body.Password, 'Name' : req.body.Name}
         //check if Value is Null
         for (const payloadKey of Object.keys(payload)) {
@@ -25,18 +25,18 @@ export class CustomersController {
                 return payloadKey.concat(' ' , 'can not be null.')
             }
         }
-        return this.customerservice.add_customer(payload)
+        return await this.customerservice.add_customer(payload)
     }
     
     @UseGuards(JwtAuthGuard)
     @Get(':id')
-    get_certain_customers(@Param('id') id, @Headers('Authorization') auth : string): any{
+    async get_certain_customers(@Param('id') id, @Headers('Authorization') auth : string) {
         //check userId
         const current_user = this.jwtUtil.decode(auth); // id , Role
         if(current_user._id != id && current_user.Role != 1 ){
             return "userId not match"
         }
-    return this.customermapper.customerview ( this.customerservice.customer_data(id) ) ;
+    return this.customermapper.customerview ( await this.customerservice.customer_data(id) ) ;
 
     }
 
@@ -61,17 +61,12 @@ export class CustomersController {
         if(current_user._id != id && current_user.Role != 1 ){
             return "userId not match"
         }
-        /*
-        if(current_user.Role != 0){
-            return "You are not customer"
-        }
-        */
         if(req.body.barId == null){
             return null
         } 
         //check userId
         await this.barservice.bar_profile(req.body.barId)
-        return this.customerservice.add_favbars(id, req.body.barId) 
+        return await this.customerservice.add_favbars(id, req.body.barId) 
 
     }
     
@@ -89,13 +84,13 @@ export class CustomersController {
 
     @UseGuards(JwtAuthGuard)
     @Patch(':id')
-    update_customer_data(@Param('id') id, @Request() req, @Headers('Authorization') auth : string): any{
+    async update_customer_data(@Param('id') id, @Request() req, @Headers('Authorization') auth : string) {
         //check userId
         const current_user = this.jwtUtil.decode(auth); // id , Role
         if(current_user._id != id && current_user.Role != 1  ){
             return "userId not match"
         }
-        return this.customerservice.edit_customer(id, req.body);
+        return this.customermapper.customerview ( await this.customerservice.edit_customer(id, req.body) ) ;
     }
 
 
