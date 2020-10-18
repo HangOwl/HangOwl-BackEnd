@@ -22,7 +22,14 @@ export class BarsController {
             return this.barmapper.object_customerview(await this.barservice.list_bars()); 
         }
     } 
-    
+    @Get('unverified_bar')
+    //@UseGuards(JwtAuthGuard)
+    async get_list_unapprove_bars( @Headers('Authorization') auth ) {
+      //const current_user = this.jwtUtil.decode(auth);
+      //if(current_user.Role != 2) return "You are not Admin"
+      return this.barmapper.object_barview(await this.barservice.list_unapprove_bars()); 
+  } 
+
     @Post()
     add_BAR( @Request() req ): any {
         //return this.barservice.add_bar();
@@ -97,7 +104,7 @@ export class BarsController {
     @Patch(':id/approve')
     async approve_bar(@Param('id') id , @Headers('Authorization') auth: string ) {
       const current_user = this.jwtUtil.decode(auth);
-      if(current_user.Role != 2) return "You are not Adminnnn"
+      if(current_user.Role != 2) return "You are not Admin"
       else this.barservice.approve_bar(id)
 
     }

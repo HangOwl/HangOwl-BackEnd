@@ -13,4 +13,3 @@ export interface Customer extends mongoose.Document {
     Favourites: string[],
   }
 
-  

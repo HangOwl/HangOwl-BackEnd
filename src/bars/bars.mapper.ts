@@ -3,6 +3,9 @@ import { Injectable } from '@nestjs/common';
 export class BarMapper {
     constructor() {}
     async customerview(bar) {
+        if(typeof bar != 'object') {
+            return bar 
+        }
         const allowed = ['AdditionalPicPath' , 'CloseWeekDay' , '_id' , 'Role' , 'BarName' , 
                          'ProfilePicPath' , 'LineID' , 'OpenTime' , 'CloseTime' , 'Address' , 'AdminApproved' , 'BarDescription' , 'BarRule']
         const payload = {};
@@ -17,7 +20,10 @@ export class BarMapper {
 
     async barview(bar) {
         const allowed = ['AdditionalPicPath' , 'CloseWeekDay' , '_id' , 'Role' , 'BarName' , 'Email' ,
-                         'ProfilePicPath' , 'LineID' , 'OpenTime' , 'CloseTime' , 'Address' , 'AdminApproved' , 'BarDescription' , 'BarRule']
+                         'ProfilePicPath' , 'LineID' , 'OpenTime' , 'CloseTime' , 'Address' , 'AdminApproved' , 'BarDescription' , 'BarRule' , 'Reservations']
+        if(typeof bar != 'object') { 
+            return bar
+        }
         const payload = {}; 
         for (var payloadKey in bar) {
             if( allowed.includes(payloadKey) )
