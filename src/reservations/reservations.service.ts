@@ -6,7 +6,6 @@ import { ReservationsModule } from './reservations.module';
 import { User } from 'src/users/users.model';
 import { Bar } from 'src/bars/bars.model';
 import { Customer } from 'src/customers/customers.model';
-
 export type Reservation = any
 
 @Injectable()
@@ -16,7 +15,7 @@ export class ReservationsService{
         @InjectModel('User') private readonly customerModel: Model<Customer>,
         @InjectModel('User') private readonly barModel: Model<Bar>,
         @InjectModel('User') private readonly userModel: Model<User>,
-        @InjectModel('Reservation') private readonly reservationModel: Model<Reservation>
+        @InjectModel('Reservation') private readonly reservationModel: Model<Reservation>,
     ) {}
     async getToday()
     {
@@ -63,14 +62,29 @@ export class ReservationsService{
     async cus_reserve_list(id)
     {
         //cusId is string
-        const reservation = await this.reservationModel.find({'CustomerId' : id }).exec();
-        return reservation
+        //const reservation = await this.reservationModel.find({'CustomerId' : id , 'Status' : { $ne: 3 } }).exec();
+        let customer;
+        customer = await this.customerModel.findById(id);
+        let reservations;
+        reservations = await this.reservationModel.find({
+          '_id' : {$in: customer.Reservations}
+        });
+        return reservations
+        //return reservation
     }
 
     async bar_reserve_list(id)
     {
-      const reservation = await this.reservationModel.find({'BarId' : id }).exec();
-        return reservation
+        //const reservation = await this.reservationModel.find({'BarId' : id , 'Status' : { $ne: 3 } }).exec();
+        //return reservation
+        let bar;
+        bar = await this.customerModel.findById(id);
+        let reservations;
+        reservations = await this.reservationModel.find({
+          '_id' : {$in: bar.Reservations}
+        });
+        return reservations
+        //return reservation
     }
 
     async delete_reserve(resId, cusId)
@@ -110,8 +124,10 @@ export class ReservationsService{
         reservation = await this.reservationModel.findById(resId);
         if (reservation.CustomerId != cusId){
           return "Your Id not match with reservation CustomerId"
-      }
-
+        }
+        if (reservation.Status != 0) {
+          return "You can not edit approved or deleted reservations"
+        }
         for (var editkey in edit_data ) {
           if( editable.includes(editkey) )
           {
@@ -138,6 +154,8 @@ export class ReservationsService{
     async delete_all_res(barId, date)
     {
         //barId is string, date is string
+        // Date format from mongodb is "2020-10-20T00:00:00.000+00:00"
+        
         return "delete all reserve in " + date + " complete";
     }
 }
