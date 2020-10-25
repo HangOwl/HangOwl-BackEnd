@@ -119,7 +119,7 @@ export class CustomersService{
       let updatedCustomer;
       updatedCustomer = await this.customer_data(cusId); 
       await updatedCustomer.updateOne({ $pull: {"Favourites": barId } } );
-      const result = await updatedCustomer.save()
+      let result = await updatedCustomer.save()
       return result;  
     }
 

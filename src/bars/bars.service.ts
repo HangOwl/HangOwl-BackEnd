@@ -67,6 +67,7 @@ export class BarsService{
           BarDescription : bar.BarDescription,
           BarRule : bar.BarRule,
           Reservations: [],
+          EmailVerify: false,
         });
         const result = await newBar.save();
         console.log(result);
@@ -157,8 +158,8 @@ export class BarsService{
       // remove additional picture
       let updatedBar = await this.bar_profile(id);
       await updatedBar.updateOne({ $pull: {"AdditionalPicPath": filename } } );
-      updatedBar.save()
-      return updatedBar.AdditionalPicPath;
+      const result = await updatedBar.save()
+      return result.AdditionalPicPath;
     }
 
     async approve_bar(id)

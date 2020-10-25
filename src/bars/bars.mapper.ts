@@ -7,7 +7,7 @@ export class BarMapper {
             return bar 
         }
         const allowed = ['AdditionalPicPath' , 'CloseWeekDay' , '_id' , 'Role' , 'BarName' , 
-                         'ProfilePicPath' , 'LineID' , 'OpenTime' , 'CloseTime' , 'Address' , 'AdminApproved' , 'BarDescription' , 'BarRule']
+                         'ProfilePicPath' , 'LineID' , 'OpenTime' , 'CloseTime' , 'Address' , 'AdminApproved' , 'BarDescription' , 'BarRule' , 'EmailVerify']
         const payload = {};
         for (var payloadKey in bar) {
             if( allowed.includes(payloadKey) )
@@ -20,7 +20,7 @@ export class BarMapper {
 
     async barview(bar) {
         const allowed = ['AdditionalPicPath' , 'CloseWeekDay' , '_id' , 'Role' , 'BarName' , 'Email' ,
-                         'ProfilePicPath' , 'LineID' , 'OpenTime' , 'CloseTime' , 'Address' , 'AdminApproved' , 'BarDescription' , 'BarRule' , 'Reservations']
+                         'ProfilePicPath' , 'LineID' , 'OpenTime' , 'CloseTime' , 'Address' , 'AdminApproved' , 'BarDescription' , 'BarRule' , 'Reservations' , 'EmailVerify']
         if(typeof bar != 'object') { 
             return bar
         }

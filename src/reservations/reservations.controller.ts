@@ -76,6 +76,13 @@ export class ReservationsController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Patch(':resId/reject')
+    reject_Reserve(@Param('resId') resId, @Headers('Authorization') auth : string): any{
+        const current_user = this.jwtUtil.decode(auth); // id , Role
+        return this.reservationservice.reject_reserve(resId,current_user._id)       
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Delete()
     delete_all_day(@Query('date') date, @Headers('Authorization') auth : string): any {
         const current_user = this.jwtUtil.decode(auth); // id , Role

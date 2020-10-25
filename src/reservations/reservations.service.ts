@@ -47,7 +47,7 @@ export class ReservationsService{
             BarName : bar.BarName,
             DateReserve : reservation.DateReserve,
             NumberOfPeople : reservation.NumberOfPeople,
-            PostScript : reservation.NumberOfPeople,
+            PostScript : reservation.PostScript,
             Status: 0,
             LastModified : await this.getToday()
           });
@@ -147,6 +147,17 @@ export class ReservationsService{
             return "Your BarId not match with reservation BarId"
         }
         updatedReservation.Status = 1;
+        const result = await updatedReservation.save();
+        return result.Status;
+    }
+    async reject_reserve(resId, barId)
+    {
+        let updatedReservation;
+        updatedReservation = await this.reservationModel.findById(resId);
+        if (updatedReservation.BarId != barId){
+            return "Your BarId not match with reservation BarId"
+        }
+        updatedReservation.Status = 2;
         const result = await updatedReservation.save();
         return result.Status;
     }

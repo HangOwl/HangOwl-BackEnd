@@ -62,7 +62,7 @@ export class CustomersController {
             return "userId not match"
         }
         if(req.body.barId == null){
-            return null
+            return "barId con not be null."
         } 
         //check userId
         await this.barservice.bar_profile(req.body.barId)
