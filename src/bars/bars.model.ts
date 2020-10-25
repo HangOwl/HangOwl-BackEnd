@@ -17,5 +17,6 @@ export interface Bar extends mongoose.Document {
     BarDescription : string;
     BarRule : string;
     Reservations: string[];
+    EmailVerify: boolean;
 
   }
