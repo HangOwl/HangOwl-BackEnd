@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { confirmEmailLink } from 'src/utils/confirmEmailLink';
+import { sendEmail } from 'src/utils/sendEmail';
 
 const bcrypt = require('bcrypt')
 
@@ -53,6 +55,7 @@ export class CustomersService{
         //adding customer procedure
         
         //email procedure
+        await sendEmail(customer.Email,await confirmEmailLink(customer.userId))
         return customer
     }
 
