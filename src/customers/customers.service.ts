@@ -5,6 +5,7 @@ import { User } from 'src/users/users.model';
 import { CustomersModule } from './customers.module';
 import { Model } from 'mongoose'
 import { Bar } from 'src/bars/bars.model';
+import { EmailService } from 'src/email.service';
 
 const bcrypt = require('bcrypt')
 
@@ -15,7 +16,9 @@ export class CustomersService{
     constructor(
       @InjectModel('User') private readonly customerModel: Model<Customer>,
       @InjectModel('User') private readonly userModel: Model<User>,
-      @InjectModel('User') private readonly barModel: Model<Bar>
+      @InjectModel('User') private readonly barModel: Model<Bar>,
+      private emailService: EmailService,
+
     ) {}
     
     async add_customer(customer)
@@ -39,6 +42,14 @@ export class CustomersService{
         //Generate encrpte password
         customer.Salt = await bcrypt.genSalt(10) 
         customer.Password = await bcrypt.hash(customer.Password , customer.Salt )
+        customer.token = ''
+        for (var i = 0; i < 8; i++) {
+          customer.token += Math.random().toString(36).substring(5)
+        }
+        if( ! await this.emailService.send_confirm_email(customer.Email , customer.token))
+        { 
+          return "Email verification send fail"
+        }
         //adding customer procedure
         const newCustomer = new this.customerModel({
           Email: customer.Email,
@@ -47,12 +58,14 @@ export class CustomersService{
           Role: customer.Role,
           Name: customer.Name,
           EmailVerify: customer.EmailVerify,
+          EmailVerifyToken: customer.token,
           Reservations: customer.Reservations,
           Favourites: customer.Favourites,
+          RePasswordToken: ""
         });
         const result = await newCustomer.save();
         console.log(result);
-        //email procedure
+
         return result.id as string;
     }
 

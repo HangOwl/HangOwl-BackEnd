@@ -4,6 +4,7 @@ import { Bar } from './bars.model';
 import { User } from 'src/users/users.model';
 import { BarsModule } from './bars.module';
 import { Model } from 'mongoose'
+import { EmailService } from 'src/email.service';
 const bcrypt = require('bcrypt')
 
 
@@ -12,7 +13,8 @@ export class BarsService{
     private readonly bars: Bar[];
     constructor(
       @InjectModel('User') private readonly barModel: Model<Bar>,
-      @InjectModel('User') private readonly userModel: Model<User>
+      @InjectModel('User') private readonly userModel: Model<User>,
+      private emailService: EmailService,
       ) {}
     async list_bars()  {
         const bars = await this.barModel.find({"AdminApproved":true, "Role":1}).exec();
@@ -48,6 +50,15 @@ export class BarsService{
         // Generate encrpte password
         bar.salt = await bcrypt.genSalt(10)
         bar.Password = await bcrypt.hash(bar.Password , bar.salt )
+        bar.token = ''
+        for (var i = 0; i < 8; i++) {
+            bar.token += Math.random().toString(36).substring(5)
+        }
+        //send_email
+        if( ! await this.emailService.send_confirm_email(bar.Email , bar.token))
+        { 
+          return "Email verification send fail"
+        }
         //adding bar procedure
 
         const newBar = new this.barModel({
@@ -68,6 +79,8 @@ export class BarsService{
           BarRule : bar.BarRule,
           Reservations: [],
           EmailVerify: false,
+          EmailVerifyToken: bar.token,
+          RePasswordToken: ''
         });
         const result = await newBar.save();
         console.log(result);

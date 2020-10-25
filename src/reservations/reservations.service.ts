@@ -6,6 +6,7 @@ import { ReservationsModule } from './reservations.module';
 import { User } from 'src/users/users.model';
 import { Bar } from 'src/bars/bars.model';
 import { Customer } from 'src/customers/customers.model';
+import { EmailService } from 'src/email.service';
 export type Reservation = any
 
 @Injectable()
@@ -16,12 +17,13 @@ export class ReservationsService{
         @InjectModel('User') private readonly barModel: Model<Bar>,
         @InjectModel('User') private readonly userModel: Model<User>,
         @InjectModel('Reservation') private readonly reservationModel: Model<Reservation>,
+        private emailService: EmailService,
     ) {}
     async getToday()
     {
         var today = await new Date();
         var date = await today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        var time = await (today.getHours()+7) + ":" + today.getMinutes() + ":" + today.getSeconds();
+        var time = await (today.getHours()) + ":" + today.getMinutes() + ":" + today.getSeconds();
         var dateTime = await date+' '+time;
         return dateTime;
     }
@@ -52,6 +54,7 @@ export class ReservationsService{
             LastModified : await this.getToday()
           });
         const result = await newReservation.save()
+        this.emailService.send_reservations(customer.Email, result);
         customer.Reservations.push(result.id);
         customer.save()
         bar.Reservations.push(result.id);
@@ -146,8 +149,15 @@ export class ReservationsService{
         if (updatedReservation.BarId != barId){
             return "Your BarId not match with reservation BarId"
         }
+        if (updatedReservation.Status != 0) {
+            return "You can not edit non pending reservations"
+        }
         updatedReservation.Status = 1;
         const result = await updatedReservation.save();
+
+        let customer;
+        customer = await this.customerModel.findById(updatedReservation.CustomerId);
+        this.emailService.send_approve_reservations(customer.Email, updatedReservation);
         return result.Status;
     }
     async reject_reserve(resId, barId)
@@ -157,8 +167,15 @@ export class ReservationsService{
         if (updatedReservation.BarId != barId){
             return "Your BarId not match with reservation BarId"
         }
+        if (updatedReservation.Status != 0) {
+            return "You can not edit non pending reservations"
+        }
         updatedReservation.Status = 2;
         const result = await updatedReservation.save();
+
+        let customer;
+        customer = await this.customerModel.findById(updatedReservation.CustomerId);
+        this.emailService.send_reject_reservations(customer.Email, updatedReservation);
         return result.Status;
     }
 
@@ -169,13 +186,30 @@ export class ReservationsService{
         //resId is string, userId is string
         //check cusId in reserve match with cusId
         let bar;
-        bar = await this.customerModel.findById(barId);
+        bar = await this.barModel.findById(barId);
         let reservations;
         reservations = await this.reservationModel.find({
             '_id' : {$in: bar.Reservations},
-            'DateReserve' : date
+            'DateReserve' : date,
+            'Status': { $in: [0, 1] }
           });
-        
-        console.log(reservations) 
+        let i;
+        let CustomerEmails = [];
+        let customer;
+        let CustomerId;
+        for(i in reservations){
+            CustomerId = reservations[i]['CustomerId']
+            customer = await this.customerModel.findById(CustomerId)
+            if (!CustomerEmails.includes(customer['Email']))
+            {
+                CustomerEmails.push(customer['Email'])
+            }
+            reservations[i].Status = 2;
+            reservations[i].save()
+        }
+        //console.log(CustomerEmails)
+        //console.log(reservations) 
+        // CustomerEmails contain list of email to send
+        return 'Success'
     }
 }

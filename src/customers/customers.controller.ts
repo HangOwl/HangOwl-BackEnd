@@ -37,7 +37,6 @@ export class CustomersController {
             return "userId not match"
         }
     return this.customermapper.customerview ( await this.customerservice.customer_data(id) ) ;
-
     }
 
     @UseGuards(JwtAuthGuard)

@@ -29,6 +29,10 @@ export class ReservationsController {
                 return payloadKey.concat(' ' , 'can not be null.')
             }
         }
+        const date_regex =  /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/
+        if ( ! date_regex.test(req.body.DateReserve) ) {
+            return 'date format invalid.'
+        }
         return this.reservationservice.add_reserve(payload)
     }
 
@@ -86,8 +90,13 @@ export class ReservationsController {
     @Delete()
     delete_all_day(@Request() req , @Headers('Authorization') auth : string): any {
         const current_user = this.jwtUtil.decode(auth); // id , Role
-        
-        console.log(req.body.date)
+        if ( req.body.date == null ) {
+            return 'date cannot be null.'
+        }
+        const date_regex =  /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/
+        if ( ! date_regex.test(req.body.date) ) {
+            return 'date format invalid.'
+        }
         const date = req.body.date.concat('' , 'T00:00:00.000Z')
         return this.reservationservice.delete_all_res(current_user._id,date)
     }

@@ -21,7 +21,9 @@ export const UserSchema = new mongoose.Schema(
         AdminApproved : Boolean,
         BarDescription : String,
         BarRule : String,
-        Reservations: [String]
+        Reservations: [String],
+        EmailVerifyToken: String,
+        RePasswordToken: String
 
     }
     , { collection: 'Users' }
@@ -49,5 +51,6 @@ export interface User extends mongoose.Document {
     BarDescription : string;
     BarRule : string;
     Reservations: string[];
-
+    EmailVerifyToken: string,
+    RePasswordToken: string
   }
