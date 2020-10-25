@@ -175,7 +175,6 @@ export class ReservationsService{
             '_id' : {$in: bar.Reservations},
             'DateReserve' : date
           });
-        
         console.log(reservations) 
     }
 }
