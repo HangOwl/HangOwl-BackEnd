@@ -166,7 +166,16 @@ export class ReservationsService{
     {
         //barId is string, date is string
         // Date format from mongodb is "2020-10-20T00:00:00.000+00:00"
+        //resId is string, userId is string
+        //check cusId in reserve match with cusId
+        let bar;
+        bar = await this.customerModel.findById(barId);
+        let reservations;
+        reservations = await this.reservationModel.find({
+            '_id' : {$in: bar.Reservations},
+            'DateReserve' : date
+          });
         
-        return "delete all reserve in " + date + " complete";
+        console.log(reservations) 
     }
 }

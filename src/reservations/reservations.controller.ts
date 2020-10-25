@@ -84,9 +84,11 @@ export class ReservationsController {
 
     @UseGuards(JwtAuthGuard)
     @Delete()
-    delete_all_day(@Query('date') date, @Headers('Authorization') auth : string): any {
+    delete_all_day(@Request() req , @Headers('Authorization') auth : string): any {
         const current_user = this.jwtUtil.decode(auth); // id , Role
-        date = date.concat('' , 'T00:00:00.000Z')
+        
+        console.log(req.body.date)
+        const date = req.body.date.concat('' , 'T00:00:00.000Z')
         return this.reservationservice.delete_all_res(current_user._id,date)
     }
 }
