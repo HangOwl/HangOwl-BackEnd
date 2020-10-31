@@ -28,7 +28,7 @@ export class AdminsService {
       admin.salt = await bcrypt.genSalt(10)
       admin.Password = await bcrypt.hash(admin.Password , admin.salt )
       //adding admin procedure
-
+      
       const newAdmin = new this.adminModel({
         Email: admin.Email,
         Password: admin.Password,
@@ -37,6 +37,7 @@ export class AdminsService {
         Name: admin.AdminName,
       });
       const result = await newAdmin.save();
+      console.log(result)
       //email procedure
       return result.id as string;
   }

@@ -21,7 +21,9 @@ export const UserSchema = new mongoose.Schema(
         AdminApproved : Boolean,
         BarDescription : String,
         BarRule : String,
-        Reservations: [String]
+        Reservations: [String],
+        EmailVerifyToken: String,
+        RePasswordToken: String
 
     }
     , { collection: 'Users' }
@@ -36,7 +38,7 @@ export interface User extends mongoose.Document {
     Name: String,
     EmailVerify: Boolean,
     CancelAccount: Boolean,
-    Favourites: any,
+    Favourites: string[],
     BarName: string;
     ProfilePicPath : string;
     AdditionalPicPath : string[];
@@ -49,5 +51,6 @@ export interface User extends mongoose.Document {
     BarDescription : string;
     BarRule : string;
     Reservations: string[];
-
+    EmailVerifyToken: string,
+    RePasswordToken: string
   }
