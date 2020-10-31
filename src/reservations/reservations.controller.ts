@@ -3,23 +3,22 @@ import { ReservationsService } from './reservations.service'
 import { JWTUtil } from 'src/auth/JWTUtil';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { BarsService } from 'src/bars/bars.service';
-
+import { ReservationsMapper } from './reservations.mapper'
 @Controller('reservations')
 export class ReservationsController {
 
     constructor(private readonly reservationservice: ReservationsService,
                 private readonly jwtUtil: JWTUtil,
-                private readonly barservice: BarsService ) {}
+                private readonly barservice: BarsService ,
+                private readonly reservationmapper: ReservationsMapper) {}
     
     @UseGuards(JwtAuthGuard)         
     @Post()
     add_Reserve( @Request() req, @Headers('Authorization') auth : string ): any {
         const current_user = this.jwtUtil.decode(auth); // id , Role
-        /*
         if(current_user.Role != 0){
             return "You are not customer"
         }
-        */
         const payload = { 'CustomerId' : current_user._id ,'BarId' : req.body.barId ,'DateReserve' : req.body.DateReserve,
                           'NumberOfPeople' : req.body.NumberOfPeople , 'PostScript' : req.body.Postscript}
         //check if Value is Null
@@ -38,13 +37,14 @@ export class ReservationsController {
 
     @UseGuards(JwtAuthGuard)         
     @Get()
-    get_reservations_data(@Headers('Authorization') auth : string) : any {
+    async get_reservations_data(@Headers('Authorization') auth : string)   {
         const current_user = this.jwtUtil.decode(auth); // id , Role
+        console.log(current_user)
         if(current_user.Role == 0){
-            return this.reservationservice.cus_reserve_list(current_user._id)
+            return this.reservationmapper.object_view( await this.reservationservice.cus_reserve_list(current_user._id) )
         }
         if(current_user.Role == 1){
-            return this.reservationservice.bar_reserve_list(current_user._id)
+            return this.reservationmapper.object_view( await this.reservationservice.bar_reserve_list(current_user._id)  )
         }
     }
 

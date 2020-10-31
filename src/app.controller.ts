@@ -37,7 +37,7 @@ export class AppController {
     const response =  await this.authService.login(req.user);
     if(response.EmailVerify == false) return "Verify your email first"  
     response.access_token = 'bearer'.concat(' ' , response.access_token)
-    return { 'Authorization' : response.access_token , 'id' : response.id }
+    return { 'Authorization' : response.access_token , 'id' : response.id , 'Role' :response.Role }
   }
 
   @Get('auth/verify/:token')

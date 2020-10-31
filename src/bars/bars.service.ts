@@ -5,6 +5,7 @@ import { User } from 'src/users/users.model';
 import { BarsModule } from './bars.module';
 import { Model } from 'mongoose'
 import { EmailService } from 'src/email.service';
+import { ReservationsService } from 'src/reservations/reservations.service'
 const bcrypt = require('bcrypt')
 
 
@@ -15,6 +16,7 @@ export class BarsService{
       @InjectModel('User') private readonly barModel: Model<Bar>,
       @InjectModel('User') private readonly userModel: Model<User>,
       private emailService: EmailService,
+      private reservationService : ReservationsService
       ) {}
     async list_bars()  {
         const bars = await this.barModel.find({"AdminApproved":true, "Role":1}).exec();
@@ -103,6 +105,12 @@ export class BarsService{
         if(edit_content.Email) {
           if(await this.userModel.findOne({'Email':edit_content.Email})) return "Email already exist."
         }
+        if(edit_content.BarName){
+          //edit all reservation.BarName
+          this.change_reservations_bar_name(id, edit_content.BarName)
+        }
+
+        //update bar
         let updatedBar = await this.bar_profile(id);
         for (var editkey in edit_content ) {
           if( editable.includes(editkey) )
@@ -110,8 +118,26 @@ export class BarsService{
             updatedBar[editkey] = edit_content[editkey]
           }
         }
+        
+        if(edit_content.CloseWeekDay){
+          //reject all reservation according to new CloseWeekDay
+          this.reservationService.reject_res_new_close_weekday(updatedBar)
+        }
         const result = await updatedBar.save()
         return result
+    }
+
+    
+    async change_reservations_bar_name(id , name){
+        let updatedReservations
+        updatedReservations = await this.reservationService.bar_reserve_list(id)
+        console.log(updatedReservations)
+        let i
+        for(i in updatedReservations)
+        {
+          updatedReservations[i]['BarName'] = name
+          const result = await updatedReservations[i].save()
+        }
     }
     async bar_profile(id)
     {
@@ -131,7 +157,7 @@ export class BarsService{
         }
         return bar;
     }
-
+    
     async bar_search(search_text)
     {
       console.log ('search_bar');
