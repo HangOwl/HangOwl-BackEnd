@@ -6,7 +6,7 @@ import { CustomersModule } from './customers.module';
 import { Model } from 'mongoose'
 import { Bar } from 'src/bars/bars.model';
 import { EmailService } from 'src/email.service';
-
+import { ReservationsService } from 'src/reservations/reservations.service'
 const bcrypt = require('bcrypt')
 
 
@@ -18,6 +18,7 @@ export class CustomersService{
       @InjectModel('User') private readonly userModel: Model<User>,
       @InjectModel('User') private readonly barModel: Model<Bar>,
       private emailService: EmailService,
+      private reservationService : ReservationsService,
 
     ) {}
     
@@ -150,6 +151,9 @@ export class CustomersService{
         if(edit_content.Email) {
           if(await this.userModel.findOne({'Email':edit_content.Email})) return "Email already exists"
         }
+        if(edit_content.Name){
+          this.change_reservations_customer_name(id,edit_content.Name)
+        }
         let updatedCustomer = await this.customer_data(id);
         for (var editkey in edit_content ) {
           if( editable.includes(editkey) )
@@ -159,6 +163,19 @@ export class CustomersService{
         }
         const result = await updatedCustomer.save()
         return result
+    }
+
+    async change_reservations_customer_name(id,name)
+    {
+        let updatedReservations
+        updatedReservations = await this.reservationService.cus_reserve_list(id)
+        console.log(updatedReservations)
+        let i
+        for(i in updatedReservations)
+        {
+          updatedReservations[i]['CustomerName'] = name
+          const result = await updatedReservations[i].save()
+        }
     }
 
 }

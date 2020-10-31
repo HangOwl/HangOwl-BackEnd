@@ -32,14 +32,14 @@ export class AuthService {
   }
 
   
-
   async login(user : any){
       const payload = user
       console.log(payload)
       return {
           access_token: this.JwtService.sign(payload) ,
           EmailVerify: payload.EmailVerify ,
-          id: payload._id
+          id: payload._id ,
+          Role: payload.Role
       }
   }
 }

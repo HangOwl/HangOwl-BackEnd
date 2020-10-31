@@ -5,12 +5,12 @@ import { UserSchema } from 'src/users/users.model'
 import { CustomerMapper } from './customers.mapper';
 import { EmailService } from 'src/email.service';
 import { AppModule } from 'src/app.module';
-
+import { ReservationsModule } from 'src/reservations/reservations.module';
 
 
 @Module({
-  imports: [MongooseModule.forFeature([{name: 'User', schema: UserSchema}])  ],
-  providers: [CustomersService , CustomerMapper ,EmailService ],
+  imports: [MongooseModule.forFeature([{name: 'User', schema: UserSchema}]) , ReservationsModule  ],
+  providers: [CustomersService , CustomerMapper ,EmailService, ],
   exports: [CustomersService  , CustomerMapper ],
 })
 

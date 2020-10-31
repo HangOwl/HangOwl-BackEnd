@@ -7,6 +7,7 @@ import { User } from 'src/users/users.model';
 import { Bar } from 'src/bars/bars.model';
 import { Customer } from 'src/customers/customers.model';
 import { EmailService } from 'src/email.service';
+import { concat } from 'rxjs';
 export type Reservation = any
 
 @Injectable()
@@ -18,7 +19,27 @@ export class ReservationsService{
         @InjectModel('User') private readonly userModel: Model<User>,
         @InjectModel('Reservation') private readonly reservationModel: Model<Reservation>,
         private emailService: EmailService,
-    ) {}
+    ) {} 
+    async findByResId(ResId){
+        let reservation 
+        try {
+            reservation = await this.reservationModel.findOne({"ResId":ResId})
+        }catch(error){
+            throw new NotFoundException('Could not find reservation.');
+        }
+        if (!reservation) {
+            throw new NotFoundException('Could not find reservation.');
+        }
+        return reservation
+    }
+
+    async getDayOfWeek(date) {
+        //date format is 2020-10-31
+        const dayOfWeek = new Date(date).getDay();
+        console.log(dayOfWeek)    
+        return isNaN(dayOfWeek) ? null : 
+            [0,1,2,3,4,5,6][dayOfWeek]
+    }
     async getToday()
     {
         var today = await new Date();
@@ -40,14 +61,41 @@ export class ReservationsService{
         else if (bar.Role != 1){
             return "user from BarId is not bar";
         }
+        //let DateReserve = new Date(reservation.DateReserve)
+        //if( DateReserve < Today ) return "Date reserve is invalid"
+        //genId is random id
+        //resId is reservation id
+        let resId;
+        let genId;
+        do{
+            genId = '';
+            resId = '';
+            for (var i = 0; i < 2; i++) {
+                genId += Math.random().toString(36).substring(5)
+            }
+            //get first 10 characters from genId
+            for (var i = 0; i < 10; i++){
+                resId += genId[i]
+            }
+        }while(await this.reservationModel.findOne({'id':resId}))
+        // id is after hereeee
         let customer;
         customer = await this.customerModel.findById(reservation.CustomerId);
+        let DateOfWeekReserve = await this.getDayOfWeek(reservation.DateReserve);
+        
+        //find if datereserve is close by weekday
+        if(bar.CloseWeekDay[DateOfWeekReserve]){
+            return "Bar not open"
+        }
+        
         const newReservation = new this.reservationModel({
+            ResID: resId,
             CustomerId : reservation.CustomerId,
             BarId : reservation.BarId,
             CustomerName : customer.Name,
             BarName : bar.BarName,
             DateReserve : reservation.DateReserve,
+            DateOfWeekReserve : DateOfWeekReserve,
             NumberOfPeople : reservation.NumberOfPeople,
             PostScript : reservation.PostScript,
             Status: 0,
@@ -71,7 +119,7 @@ export class ReservationsService{
         let reservations;
         reservations = await this.reservationModel.find({
           '_id' : {$in: customer.Reservations}
-        });
+        }).sort([["Status",1],["DateReserve", 1], ["LastModified",1]]);
         return reservations
         //return reservation
     }
@@ -85,7 +133,7 @@ export class ReservationsService{
         let reservations;
         reservations = await this.reservationModel.find({
           '_id' : {$in: bar.Reservations}
-        });
+        }).sort([["Status",1],["DateReserve", 1], ["LastModified",1]]);
         return reservations
         //return reservation
     }
@@ -104,15 +152,15 @@ export class ReservationsService{
         updatedReservation.Status = 3;
         
         //remove reservation from bar and customer
-        let updatedCustomer;
-        updatedCustomer = await this.customerModel.findById(updatedReservation.CustomerId);
-        await updatedCustomer.updateOne({ $pull: {"Reservations": resId } } );
-        updatedCustomer.save() 
+        //let updatedCustomer;
+        //updatedCustomer = await this.customerModel.findById(updatedReservation.CustomerId);
+        //await updatedCustomer.updateOne({ $pull: {"Reservations": resId } } );
+        //updatedCustomer.save() 
 
-        let updatedBar;
-        updatedBar = await this.barModel.findById(updatedReservation.BarId);
-        await updatedBar.updateOne({ $pull: {"Reservations": resId } } );
-        updatedBar.save()  
+        //let updatedBar;
+        //updatedBar = await this.barModel.findById(updatedReservation.BarId);
+        //await updatedBar.updateOne({ $pull: {"Reservations": resId } } );
+        //updatedBar.save()  
     
         
         const result = await updatedReservation.save();
@@ -124,7 +172,7 @@ export class ReservationsService{
         //id is string
         const editable = [ 'DateReserve' , 'NumberOfPeople' , 'PostScript'] 
         let reservation;
-        reservation = await this.reservationModel.findById(resId);
+        reservation = await this.findByResId(resId);
         if (reservation.CustomerId != cusId){
           return "Your Id not match with reservation CustomerId"
         }
@@ -145,7 +193,7 @@ export class ReservationsService{
     async approve_reserve(resId, barId)
     {
         let updatedReservation;
-        updatedReservation = await this.reservationModel.findById(resId);
+        updatedReservation = await this.findByResId(resId);
         if (updatedReservation.BarId != barId){
             return "Your BarId not match with reservation BarId"
         }
@@ -160,10 +208,36 @@ export class ReservationsService{
         this.emailService.send_approve_reservations(customer.Email, updatedReservation);
         return result.Status;
     }
+    async reject_res_new_close_weekday(bar){
+        let updatedReservations;
+        for(let i in bar.CloseWeekDay){
+            if(bar.CloseWeekDay[i]){
+                //get all rervation in bar that has new close day and DateReserve is greater or equal than today
+                updatedReservations = await this.reservationModel.find({
+                    '_id' : {$in: bar.Reservations},
+                    'DateOfWeekReserve' : i ,
+                    'DateReserve': { $gte: await this.getToday() }
+                })
+                
+            //reject all reservation that you can find 
+            for(let j in updatedReservations){
+                if(updatedReservations[j].Status == 2)
+                {
+                    continue
+                }
+                //console.log(updatedReservations[j])
+                
+                this.reject_reserve(updatedReservations[j].ResId, bar.id)
+            }
+          }
+        }
+    }
     async reject_reserve(resId, barId)
     {
         let updatedReservation;
-        updatedReservation = await this.reservationModel.findById(resId);
+        updatedReservation = await this.findByResId(resId);
+        //console.log('rejecting ... ' , resId , updatedReservation['BarId'] , barId )
+        //console.log('reservation data : ' , updatedReservation )
         if (updatedReservation.BarId != barId){
             return "Your BarId not match with reservation BarId"
         }
@@ -175,6 +249,7 @@ export class ReservationsService{
 
         let customer;
         customer = await this.customerModel.findById(updatedReservation.CustomerId);
+        
         this.emailService.send_reject_reservations(customer.Email, updatedReservation);
         return result.Status;
     }
@@ -182,7 +257,7 @@ export class ReservationsService{
     async delete_all_res(barId, date)
     {
         //barId is string, date is string
-        // Date format from mongodb is "2020-10-20T00:00:00.000+00:00"
+        //Date format from mongodb is "2020-10-20T00:00:00.000+00:00"
         //resId is string, userId is string
         //check cusId in reserve match with cusId
         let bar;
@@ -204,12 +279,23 @@ export class ReservationsService{
             {
                 CustomerEmails.push(customer['Email'])
             }
-            reservations[i].Status = 2;
+            reservations[i].Status = 3;
             reservations[i].save()
         }
         //console.log(CustomerEmails)
         //console.log(reservations) 
-        // CustomerEmails contain list of email to send
+        //CustomerEmails contain list of email to send
+        //sendtoEmail is string of CustomerEmails
+        let sendtoEmail = '';
+        for(var j = 0; j<CustomerEmails.length; j++){
+            sendtoEmail += CustomerEmails[j]
+            if(j<CustomerEmails.length-1){
+                sendtoEmail += ',';
+            }
+            console.log(sendtoEmail) 
+        }
+        console.log(sendtoEmail)
+        this.emailService.send_emergency_close_email(sendtoEmail, bar, date);
         return 'Success'
     }
 }

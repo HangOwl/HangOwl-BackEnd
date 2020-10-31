@@ -2,11 +2,13 @@ import * as mongoose from 'mongoose';
 
 export const ReservationSchema = new mongoose.Schema(
     {
+        ResId: {type: String, required: true},
         CustomerId : {type: String, required: true},
         BarId : {type: String, required: true},
         CustomerName : {type: String, required: true},
         BarName : {type: String, required: true},
         DateReserve : {type: Date, required: true},
+        DateOfWeekReserve : {type: Number, required: true},
         NumberOfPeople: {type: Number, required:true},
         PostScript: String,
         Status: Number,
@@ -18,11 +20,13 @@ export const ReservationSchema = new mongoose.Schema(
 
 export interface User extends mongoose.Document {
     id: string;
+    ResId : string;
     CustomerId : string;
     BarId : string;
     CustomerName : string;
     BarName : string;
     DateReserve : string;
+    DateOfWeekReserve : number;
     NumberOfPeople : string;
     PostScript : string;
     Status : number;

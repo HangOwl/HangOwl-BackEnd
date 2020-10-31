@@ -1,8 +1,7 @@
 import { Injectable  } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 
-const base = 'http://localhost:3000'
-
+const base = 'http://35.240.130.253:3001'
 
 @Injectable()
 export class EmailService {
@@ -103,6 +102,23 @@ export class EmailService {
             DateReserve : Reservation.DateReserve,
             NumberOfPeople : Reservation.NumberOfPeople,
             PostScript : Reservation.PostScript
+          },
+      })
+      return result
+  }
+
+  async send_emergency_close_email(email, bar, date)
+  {
+      console.log(bar)
+      const result = await this.mailerService.sendMail({
+        to: email , 
+        from: 'noreply@gmail.com', 
+        subject: 'Hangowl Emergency Close Bar', 
+        template: 'emergency_close_email.ejs', 
+        context: {  
+            BarName : bar.BarName,
+            DateReserve : date,
+            PostScript : bar.PostScript
           },
       })
       return result
