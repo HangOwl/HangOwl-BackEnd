@@ -63,7 +63,7 @@ export class EmailService {
         subject: 'Hangowl Reservation Accept', 
         template: 'approve_reservation_email.ejs', 
         context: {  
-            ReservationId : Reservation._id,
+            ReservationId : Reservation.ResId,
             BarName : Reservation.BarName,
             DateReserve : Reservation.DateReserve,
             NumberOfPeople : Reservation.NumberOfPeople,
@@ -81,7 +81,7 @@ export class EmailService {
         subject: 'Hangowl Reservation Reject', 
         template: 'reject_reservation_email.ejs', 
         context: {  
-            ReservationId : Reservation._id,
+            ReservationId : Reservation.ResId,
             BarName : Reservation.BarName,
             DateReserve : Reservation.DateReserve,
             NumberOfPeople : Reservation.NumberOfPeople,
@@ -100,7 +100,7 @@ export class EmailService {
         subject: 'Hangowl Reservation placed', 
         template: 'place_reservation_email.ejs', 
         context: {  
-            ReservationId : Reservation._id,
+            ReservationId : Reservation.ResId,
             BarName : Reservation.BarName,
             DateReserve : Reservation.DateReserve,
             NumberOfPeople : Reservation.NumberOfPeople,
