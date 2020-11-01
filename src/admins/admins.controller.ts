@@ -5,13 +5,13 @@ import { JWTUtil } from 'src/auth/JWTUtil';
 @Controller('admins')
 export class AdminsController {
     constructor(private adminservice: AdminsService , private readonly jwtUtil: JWTUtil ) {}
-    @UseGuards(JwtAuthGuard)
+    //@UseGuards(JwtAuthGuard)
     @Post()
     async add_ADMIN( @Request() req , @Headers('Authorization') auth ) {
 
         //return this.barservice.add_bar();
-        const current_user = this.jwtUtil.decode(auth);
-        if(current_user.Role != 2) return "You are not admin"
+        //const current_user = this.jwtUtil.decode(auth);
+        //if(current_user.Role != 2) return "You are not admin"
         const payload = { 'Email' : req.body.Email , 'Password' : req.body.Password  , 'AdminName' : req.body.Name } 
         return this.adminservice.add_admin(payload)
     }

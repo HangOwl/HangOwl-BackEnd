@@ -75,6 +75,7 @@ export class BarsService{
           OpenTime : bar.OpenTime,
           CloseTime : bar.CloseTime,
           CloseWeekDay : bar.CloseWeekDay,
+          EmergencyCloseDates: [],
           Address: bar.Address,
           AdminApproved : false,
           BarDescription : bar.BarDescription,

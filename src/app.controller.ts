@@ -7,7 +7,7 @@ import { JwtStrategy } from 'src/auth/jwt.strategy';
 import { JWTUtil } from 'src/auth/JWTUtil';
 import { EmailService } from './email.service';
 import { UsersService } from './users/users.service';
-
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService ,
@@ -57,10 +57,20 @@ export class AppController {
     if(req.body.token == null) return 'Token cannot be null'
     return await this.userService.ChangePassword(req.body.token , req.body.Password)
   }
-  @Get('comfirm')
-  async email_test() {
-    return await this.emailService.send_email( )
+
+  @UseGuards(JwtAuthGuard)
+  @Post('auth/re_token')
+  async retoken( @Headers('Authorization') auth : string ) 
+  {
+      const current_user = this.jwtUtil.decode(auth)
+      const user = await this.userService.findOneId(current_user._id)
+      const response =  await this.authService.login(user);
+      if(response.EmailVerify == false) return "Verify your email first"  
+      response.access_token = 'bearer'.concat(' ' , response.access_token)
+      return { 'Authorization' : response.access_token  }
   }
+  
+
 }
 
 

@@ -10,7 +10,7 @@ import { JWTUtil } from './JWTUtil';
 @Module({
   imports: [UsersModule, PassportModule,JwtModule.register({
     secret: jwtConstants.secret ,
-    signOptions: { expiresIn: '3h' }
+    signOptions: { expiresIn: '2d' }
   })],
   providers: [AuthService, LocalStrategy , JwtStrategy , JWTUtil],
   exports: [AuthService , JWTUtil ]

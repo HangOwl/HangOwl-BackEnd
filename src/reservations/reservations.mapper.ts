@@ -22,10 +22,10 @@ export class ReservationsMapper {
             console.log(payload['DateReserve'])
             date = new Date(payload['DateReserve']); 
             day = date.getDate()
-            if( day < 10 ) { day = `0${day}`  }
-            if( month < 10 ) { month = `0${month}`}
             month = date.getMonth() + 1
             year = date.getFullYear()
+            if( day < 10 ) { day = `0${day}`  }
+            if( month < 10 ) { month = `0${month}`}
             payload['DateReserve'] = `${day}-${month}-${year}`
         }
         if ( payload.hasOwnProperty('LastModified') )

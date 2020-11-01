@@ -6,6 +6,7 @@ export const UserSchema = new mongoose.Schema(
         Password: {type: String, required: true},
         Salt: {type: String, required: true},
         Role: {type: Number, required: true},
+        ReEmail: String,
         Name: String,
         EmailVerify: Boolean,
         CancelAccount: Boolean,
@@ -17,14 +18,15 @@ export const UserSchema = new mongoose.Schema(
         OpenTime : String,
         CloseTime : String,
         CloseWeekDay : [Boolean],
+        EmergencyCloseDates: [String],
         Address: String,
         AdminApproved : Boolean,
         BarDescription : String,
         BarRule : String,
         Reservations: [String],
         EmailVerifyToken: String,
-        RePasswordToken: String
-
+        RePasswordToken: String,
+        ReEmailToken: String,
     }
     , { collection: 'Users' }
 )
@@ -35,6 +37,7 @@ export interface User extends mongoose.Document {
     Password: string;
     Salt: string;
     Role: number;
+    ReEmail: String,
     Name: String,
     EmailVerify: Boolean,
     CancelAccount: Boolean,
@@ -46,11 +49,13 @@ export interface User extends mongoose.Document {
     OpenTime : string;
     CloseTime : string;
     CloseWeekDay : boolean[];
+    EmergencyCloseDates: string[];
     Address: string;
     AdminApproved : boolean;
     BarDescription : string;
     BarRule : string;
     Reservations: string[];
     EmailVerifyToken: string,
-    RePasswordToken: string
+    RePasswordToken: string,
+    ReEmailToken: String,
   }

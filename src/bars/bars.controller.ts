@@ -33,7 +33,9 @@ export class BarsController {
     @Post()
     add_BAR( @Request() req ): any {
         //return this.barservice.add_bar();
-        const payload = { 'Email' : req.body.Email , 'Password' : req.body.Password ,
+        //email is LowerCase of req.body.Email
+        let email = req.body.Email.toLowerCase();
+        const payload = { 'Email' : email , 'Password' : req.body.Password ,
                           'BarName' : req.body.BarName , 'LineID' : req.body.LineID , 'OpenTime' : req.body.OpenTime , 
                           'CloseTime' : req.body.CloseTime , 'CloseWeekDay' : req.body.CloseWeekDay , 'Address' : req.body.Address ,
                           'BarDescription' : req.body.BarDescription , 'BarRule' : req.body.BarRule }

@@ -37,7 +37,10 @@ export class EmailService {
       else
         return false
   }
+  async send_change_useremail_email( email : string , token : string )
+  {
 
+  }
   async send_change_password_email( email : string , token : string )
   {
     const result = await this.mailerService.sendMail({
@@ -107,7 +110,7 @@ export class EmailService {
       return result
   }
 
-  async send_emergency_close_email(email, bar, date)
+  async send_emergency_close_email(email, bar, date, reason)
   {
       console.log(bar)
       const result = await this.mailerService.sendMail({
@@ -118,7 +121,7 @@ export class EmailService {
         context: {  
             BarName : bar.BarName,
             DateReserve : date,
-            PostScript : bar.PostScript
+            Reason : reason
           },
       })
       return result
