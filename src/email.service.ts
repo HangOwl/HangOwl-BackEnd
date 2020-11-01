@@ -1,5 +1,6 @@
 import { Injectable  } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
+import { ReservationsMapper } from './reservations/reservations.mapper';
 
 const base = 'http://35.240.130.253:3001'
 
@@ -107,7 +108,7 @@ export class EmailService {
       return result
   }
 
-  async send_emergency_close_email(email, bar, date)
+  async send_emergency_close_email(email, bar, date, reservation)
   {
       console.log(bar)
       const result = await this.mailerService.sendMail({
@@ -118,7 +119,7 @@ export class EmailService {
         context: {  
             BarName : bar.BarName,
             DateReserve : date,
-            PostScript : bar.PostScript
+            Reason : reservation.Reason
           },
       })
       return result

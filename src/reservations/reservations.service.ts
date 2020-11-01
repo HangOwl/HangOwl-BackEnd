@@ -295,7 +295,7 @@ export class ReservationsService{
             console.log(sendtoEmail) 
         }
         console.log(sendtoEmail)
-        this.emailService.send_emergency_close_email(sendtoEmail, bar, date);
+        this.emailService.send_emergency_close_email(sendtoEmail, bar, date, reservations);
         return 'Success'
     }
 }
