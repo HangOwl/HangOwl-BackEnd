@@ -33,8 +33,7 @@ export class AuthService {
 
   
   async login(user : any){
-      const result = user.toJSON()
-      const payload = { _id : result._id , Role : result.Role , EmailVerify : result.EmailVerify }
+      const payload = { _id : user._id , Role : user.Role , EmailVerify : user.EmailVerify }
       console.log(payload)
       return {
           access_token: this.JwtService.sign(payload) ,
