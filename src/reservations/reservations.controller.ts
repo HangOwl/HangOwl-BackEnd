@@ -14,7 +14,7 @@ export class ReservationsController {
     
     @UseGuards(JwtAuthGuard)         
     @Post()
-    add_Reserve( @Request() req, @Headers('Authorization') auth : string ): any {
+    async add_Reserve( @Request() req, @Headers('Authorization') auth : string ) {
         const current_user = this.jwtUtil.decode(auth); // id , Role
         if(current_user.Role != 0){
             return "You are not customer"
@@ -32,7 +32,7 @@ export class ReservationsController {
         if ( ! date_regex.test(req.body.DateReserve) ) {
             return 'date format invalid.'
         }
-        return this.reservationservice.add_reserve(payload)
+        return this.reservationmapper.view ( await this.reservationservice.add_reserve(payload) )
     }
 
     @UseGuards(JwtAuthGuard)         
@@ -62,14 +62,14 @@ export class ReservationsController {
 
     @UseGuards(JwtAuthGuard)
     @Patch(':resId')
-    edit_Reserve(@Param('resId') resId, @Request() req, @Headers('Authorization') auth : string): any{
+    async edit_Reserve(@Param('resId') resId, @Request() req, @Headers('Authorization') auth : string){
         const current_user = this.jwtUtil.decode(auth); // id , Role
         /*
         if(current_user.Role != 0){
             return "You are not customer"
         }
         */
-    return this.reservationservice.edit_reserve(resId, current_user._id, req.body)
+    return this.reservationmapper.view ( await this.reservationservice.edit_reserve(resId, current_user._id, req.body) )
     }
 
     @UseGuards(JwtAuthGuard)

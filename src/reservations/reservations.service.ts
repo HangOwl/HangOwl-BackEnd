@@ -86,10 +86,9 @@ export class ReservationsService{
         //find if datereserve is close by weekday
         if(bar.CloseWeekDay[DateOfWeekReserve]){
             return "Bar not open"
-        }
-        
+        }        
         const newReservation = new this.reservationModel({
-            ResID: resId,
+            ResId: resId,
             CustomerId : reservation.CustomerId,
             BarId : reservation.BarId,
             CustomerName : customer.Name,
@@ -102,7 +101,8 @@ export class ReservationsService{
             LastModified : await this.getToday()
           });
         const result = await newReservation.save()
-        this.emailService.send_reservations(customer.Email, result);
+        console.log("Finally")
+	this.emailService.send_reservations(customer.Email, result);
         customer.Reservations.push(result.id);
         customer.save()
         bar.Reservations.push(result.id);
