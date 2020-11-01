@@ -3,9 +3,54 @@ import { Injectable } from '@nestjs/common';
 export class BarMapper {
     constructor() {}
     async customerview(bar) {
-        //const payload = { _id : bar._id , Role : bar.Role , BarName : bar.BarName , }
+        if(typeof bar != 'object') {
+            return bar 
+        }
+        const allowed = ['AdditionalPicPath' , 'CloseWeekDay' , '_id' , 'Role' , 'BarName' , 
+                         'ProfilePicPath' , 'LineID' , 'OpenTime' , 'CloseTime' , 'Address' , 'AdminApproved' , 'BarDescription' , 'BarRule' , 'EmailVerify']
+        const payload = {};
+        for (var payloadKey in bar) {
+            if( allowed.includes(payloadKey) )
+            {
+                payload[payloadKey] = bar[payloadKey]
+            }
+        }
+        return payload
     }
 
+    async barview(bar) {
+        const allowed = ['AdditionalPicPath' , 'CloseWeekDay' , '_id' , 'Role' , 'BarName' , 'Email' ,
+                         'ProfilePicPath' , 'LineID' , 'OpenTime' , 'CloseTime' , 'Address' , 'AdminApproved' , 'BarDescription' , 'BarRule' , 'Reservations' , 'EmailVerify']
+        if(typeof bar != 'object') { 
+            return bar
+        }
+        const payload = {}; 
+        for (var payloadKey in bar) {
+            if( allowed.includes(payloadKey) )
+            {
+                payload[payloadKey] = bar[payloadKey]
+            }
+        }
+        return payload
+    }
+
+    async object_barview(bars) {
+        const payload = []
+        const it = bars.values()
+        for (var bar of it ) {
+            payload.push( await this.barview(bar) )
+        }
+        return payload
+    }
+
+    async object_customerview(bars) {
+        const payload = []
+        const it = bars.values()
+        for (var bar of it ) {
+            payload.push( await this.customerview(bar) )
+        }
+        return payload
+    }
 }
 
 
