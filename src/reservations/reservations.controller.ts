@@ -94,11 +94,12 @@ export class ReservationsController {
             return 'date cannot be null.'
         }
         const date_regex =  /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/
-        if ( ! date_regex.test(req.body.date) || req.body.DateReserve.length != 10 ) {
+        if ( ! date_regex.test(req.body.date) || req.body.date.length != 10 ) {
             return 'date format invalid.'
         }
         const date = req.body.date.concat('' , 'T00:00:00.000Z')
         return this.reservationservice.delete_all_res(current_user._id,date,req.body.reason)
     }
+
 }
 

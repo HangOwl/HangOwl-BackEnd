@@ -71,22 +71,22 @@ export class ReservationsService{
 
         return true
     }
-//    async change_date_format( text )
-//    {
-//        var date 
-//        var day
-//        var month
-//        var year
-//        date = new Date(text);
-//        console.log("date convert") 
-//        console.log(date)
-//        day = date.getDate()
-//        month = date.getMonth() + 1
-//        year = date.getFullYear()
-//        if( day < 10 ) { day = `0${day}`  }
-//        if( month < 10 ) { month = `0${month}`}
-//        return `${year}-${month}-${day}`
-//    }
+    async change_date_format( text )
+    {
+        var date 
+        var day
+        var month
+        var year
+        date = new Date(text);
+        console.log("date convert") 
+        console.log(date)
+        day = date.getDate()
+        month = date.getMonth() + 1
+        year = date.getFullYear()
+        if( day < 10 ) { day = `0${day}`  }
+        if( month < 10 ) { month = `0${month}`}
+        return `${year}-${month}-${day}`
+    }
     async add_reserve(reservation)
     {
         console.log(reservation.DateReserve )
@@ -248,6 +248,12 @@ export class ReservationsService{
         if (updatedReservation.Status != 0) {
             return "You can not edit non pending reservations"
         }
+        let today
+        today = await (await this.getToday()).substring(0,10) 
+        let DateReserve
+        DateReserve = await this.change_date_format(updatedReservation.DateReserve)
+        if( DateReserve < today ) return "Reservation Date is behind today"
+
         updatedReservation.Status = 1;
         const result = await updatedReservation.save();
 
@@ -292,6 +298,13 @@ export class ReservationsService{
         if (updatedReservation.Status != 0) {
             return "You can not edit non pending reservations"
         }
+
+        let today
+        today = await (await this.getToday()).substring(0,10) 
+        let DateReserve
+        DateReserve = await this.change_date_format(updatedReservation.DateReserve)
+        if( DateReserve < today ) return "Reservation Date is behind today"
+
         updatedReservation.Status = 2;
         const result = await updatedReservation.save();
 
@@ -354,8 +367,7 @@ export class ReservationsService{
             console.log(sendtoEmail) 
         }
         console.log(sendtoEmail)
-        //this.emailService.send_emergency_close_email(sendtoEmail, bar, date);
-
+        this.emailService.send_emergency_close_email(sendtoEmail, bar, date, reason);
         //add emergency close date to bar
         bar.EmergencyCloseDates.push(date);
         bar.save()

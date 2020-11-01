@@ -17,7 +17,9 @@ export class CustomersController {
 
     @Post()
     async add_new_customer(@Request() req) {
-        const payload = {'Email' : req.body.Email , 'Password' : req.body.Password, 'Name' : req.body.Name}
+        //email is LowerCase of req.body.Email
+        let email = req.body.Email.toLowerCase();
+        const payload = {'Email' : email , 'Password' : req.body.Password, 'Name' : req.body.Name}
         //check if Value is Null
         for (const payloadKey of Object.keys(payload)) {
             if( payload[payloadKey] == null)

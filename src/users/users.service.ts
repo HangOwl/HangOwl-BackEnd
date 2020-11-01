@@ -19,7 +19,19 @@ export class UsersService {
   async findOne(email: string): Promise<User> {
     let user;
     try{
-      user = await this.userModel.findOne({'Email':email});
+      user = await this.userModel.findOne({'Email':email.toLowerCase()});
+    }catch(error){
+      throw new NotFoundException('Could not find user.');
+    }if (!user) {
+      throw new NotFoundException('Could not find user.');
+    }
+    return user;
+  }
+
+  async findOneId(id: string): Promise<User> {
+    let user;
+    try{
+      user = await this.userModel.findOne({'_id': id });
     }catch(error){
       throw new NotFoundException('Could not find user.');
     }if (!user) {
@@ -85,4 +97,27 @@ export class UsersService {
     const result = await updateduser.save()
     return 'Success'
   }
+
+  async ChangeEmailReq( email : string, re_email )
+  {
+    var token = ''
+    for (var i = 0; i < 8; i++) {
+        token += Math.random().toString(36).substring(5)
+    }
+    let updateduser;
+    try{
+      updateduser = await this.findOne(email)
+    }catch(error){
+      throw new NotFoundException('Could not find user.');
+    }if (!updateduser) {
+      throw new NotFoundException('Could not find user.');
+    }
+    updateduser.ReEmailToken = token;
+    updateduser.ReEmail = re_email;
+    updateduser.save()
+    this.emailService.send_change_useremail_email( email , token )
+    
+    return 'Success';
+  }
+  
 }
