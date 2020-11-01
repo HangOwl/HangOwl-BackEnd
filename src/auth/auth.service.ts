@@ -26,16 +26,21 @@ export class AuthService {
     if ( user.Password == input_password)
     {
         const result = user.toJSON()
-        return { _id : result._id , Role : result.Role  }
+        return { _id : result._id , Role : result.Role , EmailVerify : result.EmailVerify }
     }
     return null
   }
 
-
+  
   async login(user : any){
-      const payload = user
+      const result = user.toJSON()
+      const payload = { _id : result._id , Role : result.Role , EmailVerify : result.EmailVerify }
+      console.log(payload)
       return {
           access_token: this.JwtService.sign(payload) ,
+          EmailVerify: payload.EmailVerify ,
+          id: payload._id ,
+          Role: payload.Role
       }
   }
 }
