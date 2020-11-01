@@ -130,10 +130,10 @@ export class ReservationsService{
         if(bar.CloseWeekDay[DateOfWeekReserve]){
             return "Bar not open due to CloseWeekDay."
         }
-        console.log(bar.EmergencyCloseDates)
-        console.log(reservation.DateReserve+"T00:00:00.000+00:00Z")
-        console.log(bar.EmergencyCloseDates.includes(reservation.Date))
-        if(bar.EmergencyCloseDates.includes(reservation.DateReserve+"T00:00:00.000+00:00Z")){
+        //console.log(bar.EmergencyCloseDates)
+        //console.log(reservation.DateReserve+"T00:00:00.000Z")
+        //console.log(bar.EmergencyCloseDates.includes(reservation.DateReserve+"T00:00:00.000Z"))
+        if(bar.EmergencyCloseDates.includes(reservation.DateReserve+"T00:00:00.000Z")){
             return "Bar not open due to Emergency."
         }
         const newReservation = new this.reservationModel({
