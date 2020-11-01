@@ -42,14 +42,54 @@ export class ReservationsService{
     }
     async getToday()
     {
-        var today = await new Date();
-        var date = await today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        var time = await (today.getHours()) + ":" + today.getMinutes() + ":" + today.getSeconds();
-        var dateTime = await date+' '+time;
+        let date = await new Date();
+        let day 
+        let month 
+        let year 
+        let hour
+        let minute
+        let second
+        day =  date.getDate()
+        month = date.getMonth() + 1
+        year = date.getFullYear()
+        if( day < 10 ) { day = `0${day}`  }
+        if( month < 10 ) { month = `0${month}`}
+        hour = date.getHours()
+        minute = date.getMinutes()
+        second = date.getSeconds()
+        let time = await hour + ":" + minute + ":" + second;
+        let dateTime = await `${year}-${month}-${day}`+' '+time;
         return dateTime;
     }
+    async IsDateBehind( time1 , time2 )
+    {
+        //return true is time1 behind time2 
+        //otherwise return false or format invalid
+        var date1 = new Date( time1 )
+        var date2 = new Date( time2 )
+        console.log(date1 , date2 )
+
+        return true
+    }
+//    async change_date_format( text )
+//    {
+//        var date 
+//        var day
+//        var month
+//        var year
+//        date = new Date(text);
+//        console.log("date convert") 
+//        console.log(date)
+//        day = date.getDate()
+//        month = date.getMonth() + 1
+//        year = date.getFullYear()
+//        if( day < 10 ) { day = `0${day}`  }
+//        if( month < 10 ) { month = `0${month}`}
+//        return `${year}-${month}-${day}`
+//    }
     async add_reserve(reservation)
     {
+        console.log(reservation.DateReserve )
         //payload in reserve is [ 'CustomerId','BarId','DateReserve', 'NumberOfPeople', 'PostScript' ]
         //Doesn't have Status, LastModified
         //Set default
@@ -65,6 +105,9 @@ export class ReservationsService{
         //if( DateReserve < Today ) return "Date reserve is invalid"
         //genId is random id
         //resId is reservation id
+        let today
+        today = await (await this.getToday()).substring(0,10) 
+        if( reservation.DateReserve < today ) return "Reservation Date is behind today"
         let resId;
         let genId;
         do{
@@ -85,11 +128,16 @@ export class ReservationsService{
         
         //find if datereserve is close by weekday
         if(bar.CloseWeekDay[DateOfWeekReserve]){
-            return "Bar not open"
+            return "Bar not open due to CloseWeekDay."
         }
-        
+        console.log(bar.EmergencyCloseDates)
+        console.log(reservation.DateReserve+"T00:00:00.000+00:00Z")
+        console.log(bar.EmergencyCloseDates.includes(reservation.Date))
+        if(bar.EmergencyCloseDates.includes(reservation.DateReserve+"T00:00:00.000+00:00Z")){
+            return "Bar not open due to Emergency."
+        }
         const newReservation = new this.reservationModel({
-            ResID: resId,
+            ResId: resId,
             CustomerId : reservation.CustomerId,
             BarId : reservation.BarId,
             CustomerName : customer.Name,
@@ -254,14 +302,25 @@ export class ReservationsService{
         return result.Status;
     }
 
-    async delete_all_res(barId, date)
+    async delete_all_res(barId, date , reason)
     {
         //barId is string, date is string
         //Date format from mongodb is "2020-10-20T00:00:00.000+00:00"
         //resId is string, userId is string
         //check cusId in reserve match with cusId
+
+        //get bar
         let bar;
         bar = await this.barModel.findById(barId);
+        //find if that date is already emergency closed
+        let today
+        today = await (await this.getToday()).substring(0,10) 
+        if( date < today ) return "Reservation Date is behind today"
+        
+        if(bar.EmergencyCloseDates.includes(date)){
+            return "this date is already close"
+        }
+
         let reservations;
         reservations = await this.reservationModel.find({
             '_id' : {$in: bar.Reservations},
@@ -295,7 +354,11 @@ export class ReservationsService{
             console.log(sendtoEmail) 
         }
         console.log(sendtoEmail)
-        this.emailService.send_emergency_close_email(sendtoEmail, bar, date);
+        //this.emailService.send_emergency_close_email(sendtoEmail, bar, date);
+
+        //add emergency close date to bar
+        bar.EmergencyCloseDates.push(date);
+        bar.save()
         return 'Success'
     }
 }

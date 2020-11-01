@@ -12,12 +12,13 @@ export interface Bar extends mongoose.Document {
     OpenTime : string;
     CloseTime : string;
     CloseWeekDay : boolean[];
+    EmergencyCloseDates: string[];
     Address: string;
     AdminApproved : boolean;
     BarDescription : string;
     BarRule : string;
     Reservations: string[];
     EmailVerify: boolean;
-    EmailVerifyToken: string,
-    RePasswordToken: string
+    EmailVerifyToken: string;
+    RePasswordToken: string;
   }

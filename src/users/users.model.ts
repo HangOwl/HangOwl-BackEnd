@@ -17,14 +17,14 @@ export const UserSchema = new mongoose.Schema(
         OpenTime : String,
         CloseTime : String,
         CloseWeekDay : [Boolean],
+        EmergencyCloseDates: [String],
         Address: String,
         AdminApproved : Boolean,
         BarDescription : String,
         BarRule : String,
         Reservations: [String],
         EmailVerifyToken: String,
-        RePasswordToken: String
-
+        RePasswordToken: String,
     }
     , { collection: 'Users' }
 )
@@ -46,11 +46,12 @@ export interface User extends mongoose.Document {
     OpenTime : string;
     CloseTime : string;
     CloseWeekDay : boolean[];
+    EmergencyCloseDates: string[];
     Address: string;
     AdminApproved : boolean;
     BarDescription : string;
     BarRule : string;
     Reservations: string[];
     EmailVerifyToken: string,
-    RePasswordToken: string
+    RePasswordToken: string,
   }

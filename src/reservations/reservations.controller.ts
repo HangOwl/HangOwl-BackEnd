@@ -14,7 +14,7 @@ export class ReservationsController {
     
     @UseGuards(JwtAuthGuard)         
     @Post()
-    add_Reserve( @Request() req, @Headers('Authorization') auth : string ): any {
+    async add_Reserve( @Request() req, @Headers('Authorization') auth : string ) {
         const current_user = this.jwtUtil.decode(auth); // id , Role
         if(current_user.Role != 0){
             return "You are not customer"
@@ -29,7 +29,7 @@ export class ReservationsController {
             }
         }
         const date_regex =  /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/
-        if ( ! date_regex.test(req.body.DateReserve) ) {
+        if ( ! date_regex.test(req.body.DateReserve) || req.body.DateReserve.length != 10 ) {
             return 'date format invalid.'
         }
         return this.reservationservice.add_reserve(payload)
@@ -88,17 +88,17 @@ export class ReservationsController {
 
     @UseGuards(JwtAuthGuard)
     @Delete()
-    delete_all_day(@Request() req , @Headers('Authorization') auth : string): any {
+    async delete_all_day(@Request() req , @Headers('Authorization') auth : string) {
         const current_user = this.jwtUtil.decode(auth); // id , Role
         if ( req.body.date == null ) {
             return 'date cannot be null.'
         }
         const date_regex =  /^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/
-        if ( ! date_regex.test(req.body.date) ) {
+        if ( ! date_regex.test(req.body.date) || req.body.DateReserve.length != 10 ) {
             return 'date format invalid.'
         }
         const date = req.body.date.concat('' , 'T00:00:00.000Z')
-        return this.reservationservice.delete_all_res(current_user._id,date)
+        return this.reservationservice.delete_all_res(current_user._id,date,req.body.reason)
     }
 }
 
