@@ -89,7 +89,12 @@ export class ReservationsController {
     @UseGuards(JwtAuthGuard)
     @Delete()
     async delete_all_day(@Request() req , @Headers('Authorization') auth : string) {
-        const current_user = this.jwtUtil.decode(auth); // id , Role
+        console.log("--------------------------- Emergency close -----------------------------")
+	console.log( req )
+	console.log("------ body -------")
+	console.log(req.body)
+	console.log("-------------------------------------------------------------------------")
+	const current_user = this.jwtUtil.decode(auth); // id , Role
         if ( req.body.date == null ) {
             return 'date cannot be null.'
         }
