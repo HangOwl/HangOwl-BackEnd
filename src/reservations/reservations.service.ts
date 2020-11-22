@@ -199,7 +199,11 @@ export class ReservationsService{
 
         //update reservation status
         updatedReservation.Status = 3;
-        
+      	let today
+        today = await (await this.getToday()).substring(0,10)
+        let DateReserve
+        DateReserve = await this.change_date_format(updatedReservation.DateReserve)
+        if( DateReserve < today ) return "Reservation Date is behind today"
         //remove reservation from bar and customer
         //let updatedCustomer;
         //updatedCustomer = await this.customerModel.findById(updatedReservation.CustomerId);
