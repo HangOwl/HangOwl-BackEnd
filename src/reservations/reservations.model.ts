@@ -18,7 +18,7 @@ export const ReservationSchema = new mongoose.Schema(
     , { collection: 'Reservations' }
 )
 
-export interface User extends mongoose.Document {
+export interface Reservation extends mongoose.Document {
     id: string;
     ResId : string;
     CustomerId : string;
