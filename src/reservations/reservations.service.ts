@@ -191,8 +191,9 @@ export class ReservationsService{
         //resId is string, userId is string
         //check cusId in reserve match with cusId
         let updatedReservation;
-        updatedReservation = await this.reservationModel.findById(resId);
-        if (updatedReservation.CustomerId != cusId){
+        updatedReservation = await this.findByResId(resId);
+        //console.log(updatedReservation)
+	if (updatedReservation.CustomerId != cusId){
             return "Your CustomerId not match with reservation CustomerId"
         }
 
@@ -227,6 +228,12 @@ export class ReservationsService{
         if (reservation.Status != 0) {
           return "You can not edit approved or deleted reservations"
         }
+	let today
+        today = await (await this.getToday()).substring(0,10)
+        let DateReserve
+        DateReserve = await this.change_date_format(updatedReservation.DateReserve)
+        if( DateReserve < today ) return "Reservation Date is behind today"
+
         for (var editkey in edit_data ) {
           if( editable.includes(editkey) )
           {
@@ -367,6 +374,8 @@ export class ReservationsService{
             console.log(sendtoEmail) 
         }
         console.log(sendtoEmail)
+	if(reason == undefined){   
+		reason = "emergency"     }
         this.emailService.send_emergency_close_email(sendtoEmail, bar, date, reason);
         //add emergency close date to bar
         bar.EmergencyCloseDates.push(date);
